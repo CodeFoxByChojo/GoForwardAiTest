@@ -108,6 +108,12 @@ namespace de.chojo.WayFinder.Manager {
         /// <param name="PlayerList"></param>
         /// <returns></returns>
         private QMatrixMemory MergeQMatrixData(List<Player> PlayerList) {
+            List<QMatrixMemory> temp = new List<QMatrixMemory>();
+            foreach (var entry in PlayerList) {
+                temp.Add(entry.CurrentQMatrix);
+            }
+
+            var mergedMemory = Helper.AddListToList(temp, Brain.CollectedMemories);
             var data = new QMatrixMemory(Goal);
             for (var i = 0; i < _dimensions.x; i++) {
                 for (var j = 0; j < _dimensions.y; j++) {
@@ -116,11 +122,11 @@ namespace de.chojo.WayFinder.Manager {
                     var right = new List<double>();
                     var left = new List<double>();
 
-                    foreach (var player in PlayerList) {
-                        up.Add(player.CurrentQMatrix.QMatrix[i, j].GetValue(Directions.Up));
-                        down.Add(player.CurrentQMatrix.QMatrix[i, j].GetValue(Directions.Down));
-                        right.Add(player.CurrentQMatrix.QMatrix[i, j].GetValue(Directions.Right));
-                        left.Add(player.CurrentQMatrix.QMatrix[i, j].GetValue(Directions.Left));
+                    foreach (var memory in mergedMemory) {
+                        up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
+                        down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
+                        right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
+                        left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
                     }
 
                     data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
@@ -154,25 +160,23 @@ namespace de.chojo.WayFinder.Manager {
         /// Redraw the heatmap
         /// </summary>
         private void DrawHeatmap() {
-            var matrix = MergeQMatrixData(_players).QMatrix;
-
+            var matrix = MergeQMatrixData(_players);
             double highestValue = 0;
 
-            for (var i = 0; i < matrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.GetLength(1); j++) {
-                    var fieldValue = matrix[i, j].GetBestValue();
+            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
+                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
+                    var fieldValue = matrix.QMatrix[i, j].GetBestValue();
 
                     if (fieldValue > highestValue) highestValue = fieldValue;
                 }
             }
 
-            for (var i = 0; i < matrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.GetLength(1); j++)
+            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
+                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++)
                     _heatMap[i, j].GetComponent<Renderer>().material.color =
-                        Helper.GetPercentAsColor(matrix[i, j].GetBestValue() / highestValue);
+                        Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
             }
         }
-
 
 
         //AI Knowledge Merging
