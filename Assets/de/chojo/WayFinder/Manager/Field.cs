@@ -88,9 +88,8 @@ namespace de.chojo.WayFinder.Manager {
 
 
         private void Update() {
-            
             UpdateMonitoring();
-            
+
             _currentRoundDuration += Time.deltaTime;
             _heatMapRefreshTimer -= Time.deltaTime;
             _roundEndTimer -= Time.deltaTime;
@@ -209,7 +208,7 @@ namespace de.chojo.WayFinder.Manager {
         /// Triggers a new round with saving the data of ais, which are not in the goal.
         /// </summary>
         [ContextMenu("EndRound")]
-        private void ForceNewRound() {
+        public void ForceNewRound() {
             foreach (var player in _players) {
                 player.SaveAndDestroy();
             }
