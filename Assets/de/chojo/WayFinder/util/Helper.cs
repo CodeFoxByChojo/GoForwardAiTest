@@ -99,6 +99,14 @@ namespace de.chojo.WayFinder.util {
         }
 
         public static Color GetPercentAsColor(double? percent) {
+            float per;
+            if (percent != null) {
+                per = (float) percent;
+            }
+            else {
+                per = 0;
+            }
+
             var blueToCyan = new Gradient();
             var cyanToGreen = new Gradient();
             var greenToYellow = new Gradient();
@@ -108,23 +116,23 @@ namespace de.chojo.WayFinder.util {
             colorKey1[0].color = Color.blue;
             colorKey1[0].time = 0.0f;
             colorKey1[1].color = Color.cyan;
-            colorKey1[1].time = 0.5f;
+            colorKey1[1].time = 0.25f;
 
             var colorKey2 = new GradientColorKey[2];
             colorKey2[0].color = Color.cyan;
-            colorKey2[0].time = 0.0f;
+            colorKey2[0].time = 0.25f;
             colorKey2[1].color = Color.green;
             colorKey2[1].time = 0.5f;
 
             var colorKey3 = new GradientColorKey[2];
             colorKey3[0].color = Color.green;
-            colorKey3[0].time = 0.0f;
+            colorKey3[0].time = 0.5f;
             colorKey3[1].color = Color.yellow;
-            colorKey3[1].time = 0.5f;
+            colorKey3[1].time = 0.75f;
 
             var colorKey4 = new GradientColorKey[2];
             colorKey4[0].color = Color.yellow;
-            colorKey4[0].time = 0.5f;
+            colorKey4[0].time = 0.75f;
             colorKey4[1].color = Color.red;
             colorKey4[1].time = 1f;
 
@@ -140,18 +148,31 @@ namespace de.chojo.WayFinder.util {
             yellowToRed.SetKeys(colorKey4, alphaKey);
 
             if (percent <= 0.25f) {
-                return blueToCyan.Evaluate((float) percent);
+                return blueToCyan.Evaluate(per);
             }
 
             if (percent > 25 && percent <= 50) {
-                return cyanToGreen.Evaluate((float) percent);
+                return cyanToGreen.Evaluate(per);
             }
 
             if (percent > 50 && percent <= 75) {
-                return greenToYellow.Evaluate((float) percent);
+                return greenToYellow.Evaluate(per);
             }
 
-            return yellowToRed.Evaluate((float) percent);
+            return yellowToRed.Evaluate(per);
+        }
+
+        public static List<QMatrixMemory> AddListToList(List<QMatrixMemory> firstList, List<QMatrixMemory> secondList) {
+            var value = new List<QMatrixMemory>();
+            foreach (var entry in firstList) {
+                value.Add(entry);
+            }
+
+            foreach (var entry in secondList) {
+                value.Add(entry);
+            }
+
+            return value;
         }
 
     }
