@@ -18,3 +18,19 @@ namespace de.chojo.WayFinder.Menu {
         [SerializeField] private Slider _actionsPerSecond;
 
         [SerializeField] private Button _learningButton;
+        private void Start() {
+            _field = Field.GetInstance();
+            if (_field.Learning) ChangeColorOfButton(_learningButton, Color.green);
+            else ChangeColorOfButton(_learningButton, Color.red);
+            StartCoroutine(LoadSliderValues());
+        }
+
+        private IEnumerator LoadSliderValues() {
+            yield return new WaitForSeconds(0.2f);
+            _aiAmount.value = _field.AIsPerRound;
+            GetIntAndSetTextForSliderWithTag(_aiAmount, Data.UiUpdateTag);
+            _roundDuration.value = _field.RoundLength;
+            GetIntAndSetTextForSliderWithTag(_roundDuration, Data.UiUpdateTag);
+            _actionsPerSecond.value = _field.ActionsPerSecond;
+            GetIntAndSetTextForSliderWithTag(_actionsPerSecond, Data.UiUpdateTag);
+        }
