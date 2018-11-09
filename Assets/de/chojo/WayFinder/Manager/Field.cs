@@ -252,8 +252,11 @@ namespace de.chojo.WayFinder.Manager {
         }
 
         private void UpdateMonitoring() {
-            _aisOnField = _players.Count;
-            if(Brain.CollectedMemories == null) return;
+            if (_players != null) {
+                _aisOnField = _players.Count;
+            }
+
+            if (Brain.CollectedMemories == null) return;
             _aisFoundGoal = Brain.CollectedMemories.Count;
         }
 
@@ -279,10 +282,38 @@ namespace de.chojo.WayFinder.Manager {
 
         public bool Learning {
             get { return _learning; }
+            set { _learning = value; }
         }
 
         public float ActionsPerSecond {
-            get { return 1 / _actionsPerSecond; }
+            get { return _actionsPerSecond; }
+            set { _actionsPerSecond = value; }
+        }
+
+        public float RoundLength {
+            get { return _roundLength; }
+            set { _roundLength = value; }
+        }
+
+        public int AisOnField {
+            get { return _aisOnField; }
+        }
+
+        public int AisFoundGoal {
+            get { return _aisFoundGoal; }
+        }
+
+        public int CurrentGeneration {
+            get { return _currentGeneration; }
+        }
+
+        public float CurrentRoundDuration {
+            get { return _currentRoundDuration; }
+        }
+
+        public int AIsPerRound {
+            get { return _aIsPerRound; }
+            set { _aIsPerRound = value; }
         }
     }
 }
