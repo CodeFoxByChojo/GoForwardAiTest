@@ -28,7 +28,7 @@ namespace de.chojo.WayFinder.Character {
 
             SetNewStartPoint();
 
-            _actionCounterCounter = _field.ActionsPerSecond;
+            _actionCounterCounter = 1 / _field.ActionsPerSecond;
             CurrentQMatrix = brain.FindQMatrix(_field.Goal);
         }
 
@@ -36,7 +36,7 @@ namespace de.chojo.WayFinder.Character {
             _actionCounterCounter -= Time.deltaTime;
             if (_actionCounterCounter < 0) {
                 Move();
-                _actionCounterCounter = _field.ActionsPerSecond;
+                _actionCounterCounter = 1 / _field.ActionsPerSecond;
                 CheckForGoal();
             }
         }
@@ -51,7 +51,7 @@ namespace de.chojo.WayFinder.Character {
             gameObject.transform.position = a;
         }
 
-        
+
         /// <summary>
         /// Checks, if the player found the goal
         /// </summary>
@@ -60,7 +60,7 @@ namespace de.chojo.WayFinder.Character {
             GoalFound();
         }
 
-        
+
         /// <summary>
         /// Unsign the Player from the Field
         /// </summary>
@@ -141,6 +141,7 @@ namespace de.chojo.WayFinder.Character {
                 value = 0;
                 Debug.Log("Calculation Failed! NaN!");
             }
+
             CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y]
                 .SetValue(direction, value);
         }
