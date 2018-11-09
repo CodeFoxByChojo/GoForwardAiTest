@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace de.chojo.WayFinder.util {
     public static class Helper {
@@ -168,6 +170,7 @@ namespace de.chojo.WayFinder.util {
                 value.Add(entry);
             }
 
+            if (secondList == null) return value;
             foreach (var entry in secondList) {
                 value.Add(entry);
             }
@@ -175,6 +178,92 @@ namespace de.chojo.WayFinder.util {
             return value;
         }
 
+        public static TextMeshProUGUI GetObjectWithTag(TextMeshProUGUI[] texts, string tag) {
+            foreach (var entry in texts) {
+                if (entry.tag.ToLower().Equals(tag.ToLower())) {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+        public static GameObject GetObjectWithTag(IEnumerable<GameObject> gameObjects, string tag) {
+            foreach (var entry in gameObjects) {
+                if (entry.tag.Equals(tag)) {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Converts a string to float. Rounds to digits.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="decimalPoints"></param>
+        /// <returns>String as float if parse is valid. 0 if not.</returns>
+        public static float StringToFloat(string text, int decimalPoints) {
+            float result;
+
+            text = text.Replace(",", ".");
+            if (float.TryParse(text, out result)) {
+                result = (float) Math.Round(result, decimalPoints);
+                return result;
+            }
+
+            return 0;
+        }
+        
+        /// <summary>
+        /// Converts a string to float. Rounds to two digits. 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>String as float if parse is valid. 0 if not.</returns>
+        public static float StringToFloat(string text) {
+            float result;
+
+            text = text.Replace(",", ".");
+            if (float.TryParse(text, out result)) {
+                result = (float) Math.Round(result, 2);
+                return result;
+            }
+
+            return 0;
+        }
+        
+        /// <summary>
+        /// Converts string to Integer.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>String as int if parse is valid. 0 if not.</returns>
+        public static int StringToInt(string text) {
+            float result;
+
+            text = text.Replace(",", ".");
+            if (float.TryParse(text, out result)) {
+                return (int)result;
+            }
+
+            return 0;
+        }
+
+        public static float ClampFloat(float value, float min, float max, out bool changed) {
+            changed = true;
+            if (value > max) return max;
+            if (value < min) return min;
+            changed = false;
+            return value;
+        }
+
+        public static int ClampInt(int value, int min, int max, out bool changed) {
+            changed = true;
+            if (value > max) return max;
+            if (value < min) return min;
+            return value;
+
+        }
+        
     }
 }
 
@@ -193,4 +282,12 @@ public enum Directions {
     Right,
     Left,
     none
+}
+
+public static class Data {
+    private static readonly string _uiUpdateTag = "UiUpdateText";
+
+    public static string UiUpdateTag {
+        get { return _uiUpdateTag; }
+    }
 }
