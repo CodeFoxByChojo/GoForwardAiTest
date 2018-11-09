@@ -43,6 +43,8 @@ namespace de.chojo.WayFinder.Manager {
         [SerializeField] [Tooltip("Player Prefab")]
         private GameObject _aiObject;
 
+        [SerializeField] private GameObject _fieldFrame;
+
         public static Field GetInstance() {
             return FindObjectOfType<Field>();
         }
@@ -151,7 +153,7 @@ namespace de.chojo.WayFinder.Manager {
             _heatMap = new GameObject[_dimensions.x, _dimensions.y];
             for (var i = 0; i < _dimensions.x; i++) {
                 for (var j = 0; j < _dimensions.y; j++) {
-                    var obj = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                    var obj = Instantiate(_fieldFrame);
                     obj.transform.SetParent(gameObject.transform);
                     obj.transform.position = new Vector3(i, j, 1);
                     obj.transform.GetComponent<Renderer>().material.color = new Color(1f, 0.92f, 0.99f);
