@@ -86,6 +86,10 @@ namespace de.chojo.WayFinder.Manager {
 
 
         private void Update() {
+            
+            UpdateMonitoring();
+            
+            _currentRoundDuration += Time.deltaTime;
             _heatMapRefreshTimer -= Time.deltaTime;
             _roundEndTimer -= Time.deltaTime;
 
@@ -216,6 +220,9 @@ namespace de.chojo.WayFinder.Manager {
         /// Starts the new round routine
         /// </summary>
         private void StartNewRound() {
+            _currentGeneration++;
+            _currentRoundDuration = 0;
+
             Brain.MergeAndSaveQMatrixData();
             GenerateNewGoal();
             for (int i = 0;
@@ -240,6 +247,12 @@ namespace de.chojo.WayFinder.Manager {
             RMatrix.QMatrix[Goal.x, Goal.y + 1].SetValue(Directions.Down, 1);
             RMatrix.QMatrix[Goal.x, Goal.y].SetValue(Directions.none, 1);
             _goal.transform.position = new Vector3(Goal.x, Goal.y, 0);
+        }
+
+        private void UpdateMonitoring() {
+            _aisOnField = _players.Count;
+            if(Brain.CollectedMemories == null) return;
+            _aisFoundGoal = Brain.CollectedMemories.Count;
         }
 
         public Vector2Int Dimensions {
