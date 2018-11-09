@@ -52,7 +52,7 @@ namespace de.chojo.WayFinder.Character {
         public void MergeAndSaveQMatrixData() {
             if(_collectedMemories == null) return;
             Debug.Log("Merged " + _collectedMemories.Count + " collected Memories!");
-            var goal = new Vector2Int(_collectedMemories[1].X, _collectedMemories[0].Y);
+            var goal = new Vector2Int(_collectedMemories[0].X, _collectedMemories[0].Y);
             var data = new QMatrixMemory(goal);
             for (var i = 0; i < _collectedMemories[0].QMatrix.GetLength(0); i++) {
                 for (var j = 0; j < _collectedMemories[0].QMatrix.GetLength(1); j++) {
