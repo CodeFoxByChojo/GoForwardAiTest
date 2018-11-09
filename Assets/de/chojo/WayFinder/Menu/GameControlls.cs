@@ -18,6 +18,8 @@ namespace de.chojo.WayFinder.Menu {
         [SerializeField] private Slider _actionsPerSecond;
 
         [SerializeField] private Button _learningButton;
+        private Field _field;
+
         private void Start() {
             _field = Field.GetInstance();
             if (_field.Learning) ChangeColorOfButton(_learningButton, Color.green);
@@ -80,3 +82,24 @@ namespace de.chojo.WayFinder.Menu {
             _field.ActionsPerSecond = GetFloatAndSetTextForSliderWithTag(slider, tag);
         }
 
+        private float GetFloatAndSetTextForSliderWithTag(Slider slider, string tag) {
+            TextMeshProUGUI[] temp = slider.gameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            if (Helper.GetObjectWithTag(temp, Data.UiUpdateTag) != null) {
+                Helper.GetObjectWithTag(temp, Data.UiUpdateTag).text = slider.value.ToString();
+                return slider.value;
+            }
+
+            return 0;
+        }
+
+        private int GetIntAndSetTextForSliderWithTag(Slider slider, string tag) {
+            TextMeshProUGUI[] temp = slider.gameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            if (Helper.GetObjectWithTag(temp, Data.UiUpdateTag) != null) {
+                Helper.GetObjectWithTag(temp, Data.UiUpdateTag).text = slider.value.ToString();
+                return (int) slider.value;
+            }
+
+            return 0;
+        }
+    }
+}
