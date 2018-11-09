@@ -67,6 +67,8 @@ namespace de.chojo.WayFinder.Manager {
 
 
         private void Start() {
+            LoadPlayerPrefs();
+
             Brain = new CollectiveBrain();
 
             _roundEndTimer = _roundLength;
@@ -254,6 +256,16 @@ namespace de.chojo.WayFinder.Manager {
             if(Brain.CollectedMemories == null) return;
             _aisFoundGoal = Brain.CollectedMemories.Count;
         }
+
+        public void LoadPlayerPrefs() {
+            _aIsPerRound = PlayerPrefsHandler.GetAiAmount();
+            _dimensions.x = PlayerPrefsHandler.GetDimensionX();
+            _dimensions.y = PlayerPrefsHandler.GetDimensionY();
+            _goalInput = new Vector2Int {x = PlayerPrefsHandler.GetGoalX(), y = PlayerPrefsHandler.GetGoalY()};
+            _roundLength = PlayerPrefsHandler.GetRoundDuration();
+            _actionsPerSecond = PlayerPrefsHandler.GetAiActionsPerSecond();
+        }
+
 
         public Vector2Int Dimensions {
             get { return _dimensions; }
