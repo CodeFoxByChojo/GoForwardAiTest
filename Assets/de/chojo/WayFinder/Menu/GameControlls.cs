@@ -34,3 +34,49 @@ namespace de.chojo.WayFinder.Menu {
             _actionsPerSecond.value = _field.ActionsPerSecond;
             GetIntAndSetTextForSliderWithTag(_actionsPerSecond, Data.UiUpdateTag);
         }
+
+        private void Update() {
+            _roundDurationDisplay.text = "Round Duration: " + Math.Round(_field.CurrentRoundDuration, 1);
+            _generationDisplay.text = _field.CurrentGeneration + ". Generation";
+            _aiAmountDisplay.text = "AIs on Field: " + _field.AisOnField;
+            _aiAmountInGoalDisplay.text = "AIs in Goal: " + _field.AisFoundGoal;
+        }
+
+        public void AdjustCamera(Slider slider) {
+            Camera.main.orthographicSize = slider.value;
+        }
+
+        public void NewGeneration() {
+            Field.GetInstance().ForceNewRound();
+        }
+
+        public void GoToMenu() {
+            SceneManager.LoadScene(0);
+        }
+
+        public void ToggleLearning(Button button) {
+            _field.Learning = !_field.Learning;
+            if (_field.Learning) {
+                ChangeColorOfButton(button, Color.green);
+                return;
+            }
+
+            ChangeColorOfButton(button, Color.red);
+        }
+
+        public void ChangeColorOfButton(Button button, Color color) {
+            button.gameObject.GetComponent<Image>().color = color;
+        }
+
+        public void AiAmountChanged(Slider slider) {
+            _field.AIsPerRound = GetIntAndSetTextForSliderWithTag(slider, tag);
+        }
+
+        public void RoundDurationChanged(Slider slider) {
+            _field.RoundLength = GetFloatAndSetTextForSliderWithTag(slider, tag);
+        }
+
+        public void AiActionsPerSecondChanged(Slider slider) {
+            _field.ActionsPerSecond = GetFloatAndSetTextForSliderWithTag(slider, tag);
+        }
+
