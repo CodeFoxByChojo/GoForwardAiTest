@@ -159,14 +159,13 @@ namespace de.chojo.WayFinder.Manager {
                 }
             }
 
-            double ColorPerPercent = 1 / highestValue;
-
             for (var i = 0; i < matrix.GetLength(0); i++) {
                 for (var j = 0; j < matrix.GetLength(1); j++)
                     _heatMap[i, j].GetComponent<Renderer>().material.color =
-                        new Color((float) ((1 - ColorPerPercent) * matrix[i, j].GetValueSum()), 0, 0);
+                        Helper.GetPercentAsColor(matrix[i, j].GetBestValue() / highestValue);
             }
         }
+
 
 
         //AI Knowledge Merging
