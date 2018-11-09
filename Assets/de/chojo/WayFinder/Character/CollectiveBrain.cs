@@ -78,5 +78,9 @@ namespace de.chojo.WayFinder.Character {
             SafeQMatrix(data);
             _collectedMemories.Clear();
         }
+
+        public List<QMatrixMemory> CollectedMemories {
+            get { return _collectedMemories; }
+        }
     }
 }
