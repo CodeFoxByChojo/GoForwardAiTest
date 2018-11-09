@@ -97,6 +97,63 @@ namespace de.chojo.WayFinder.util {
             
             return result;
         }
+
+        public static Color GetPercentAsColor(double? percent) {
+            var blueToCyan = new Gradient();
+            var cyanToGreen = new Gradient();
+            var greenToYellow = new Gradient();
+            var yellowToRed = new Gradient();
+
+            var colorKey1 = new GradientColorKey[2];
+            colorKey1[0].color = Color.blue;
+            colorKey1[0].time = 0.0f;
+            colorKey1[1].color = Color.cyan;
+            colorKey1[1].time = 0.5f;
+
+            var colorKey2 = new GradientColorKey[2];
+            colorKey2[0].color = Color.cyan;
+            colorKey2[0].time = 0.0f;
+            colorKey2[1].color = Color.green;
+            colorKey2[1].time = 0.5f;
+
+            var colorKey3 = new GradientColorKey[2];
+            colorKey3[0].color = Color.green;
+            colorKey3[0].time = 0.0f;
+            colorKey3[1].color = Color.yellow;
+            colorKey3[1].time = 0.5f;
+
+            var colorKey4 = new GradientColorKey[2];
+            colorKey4[0].color = Color.yellow;
+            colorKey4[0].time = 0.5f;
+            colorKey4[1].color = Color.red;
+            colorKey4[1].time = 1f;
+
+            var alphaKey = new GradientAlphaKey[2];
+            alphaKey[0].alpha = 1f;
+            alphaKey[0].time = 1f;
+            alphaKey[1].alpha = 1f;
+            alphaKey[1].time = 1f;
+
+            blueToCyan.SetKeys(colorKey1, alphaKey);
+            cyanToGreen.SetKeys(colorKey2, alphaKey);
+            greenToYellow.SetKeys(colorKey3, alphaKey);
+            yellowToRed.SetKeys(colorKey4, alphaKey);
+
+            if (percent <= 0.25f) {
+                return blueToCyan.Evaluate((float) percent);
+            }
+
+            if (percent > 25 && percent <= 50) {
+                return cyanToGreen.Evaluate((float) percent);
+            }
+
+            if (percent > 50 && percent <= 75) {
+                return greenToYellow.Evaluate((float) percent);
+            }
+
+            return yellowToRed.Evaluate((float) percent);
+        }
+
     }
 }
 
