@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using de.chojo.WayFinder.Character;
 using de.chojo.WayFinder.util;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace de.chojo.WayFinder.Manager {
     public class Field : MonoBehaviour {
@@ -11,11 +13,6 @@ namespace de.chojo.WayFinder.Manager {
 
         private GameObject[,] _heatMap;
 
-        [Header("Assign Section")] [SerializeField] [Tooltip("Goal Object in Scene")]
-        private GameObject _goal;
-
-        [SerializeField] [Tooltip("Player Prefab")]
-        private GameObject _aiObject;
 
         [Header("Game Setup")] [SerializeField]
         private Vector2Int _dimensions = new Vector2Int(11, 11);
@@ -33,8 +30,18 @@ namespace de.chojo.WayFinder.Manager {
         [SerializeField] private bool _learning = true;
 
         [Header("Monitoring! Do not touch!")] [SerializeField]
+        private int _aisOnField;
+
+        [SerializeField] private int _aisFoundGoal;
+        [SerializeField] private int _currentGeneration = 0;
+        [SerializeField] private float _currentRoundDuration;
         private List<Player> _players;
 
+        [Header("Assign Section")] [SerializeField] [Tooltip("Goal Object in Scene")]
+        private GameObject _goal;
+
+        [SerializeField] [Tooltip("Player Prefab")]
+        private GameObject _aiObject;
 
         public static Field GetInstance() {
             return FindObjectOfType<Field>();
