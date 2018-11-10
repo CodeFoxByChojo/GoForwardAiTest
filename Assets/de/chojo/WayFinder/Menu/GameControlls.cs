@@ -22,8 +22,16 @@ namespace de.chojo.WayFinder.Menu {
 
         private void Start() {
             _field = Field.GetInstance();
-            if (_field.Learning) ChangeColorOfButton(_learningButton, Color.green);
-            else ChangeColorOfButton(_learningButton, Color.red);
+            if (_field.Learning) {
+                ChangeColorOfButton(_learningButton, Color.green);
+                _learningButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Discovering";
+
+            }
+            else {
+                ChangeColorOfButton(_learningButton, Color.blue);
+                _learningButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Using Way Data";
+
+            }
             StartCoroutine(LoadSliderValues());
         }
 
@@ -39,7 +47,7 @@ namespace de.chojo.WayFinder.Menu {
 
         private void Update() {
             _roundDurationDisplay.text = "Round Duration: " + Math.Round(_field.CurrentRoundDuration, 1);
-            _generationDisplay.text = _field.CurrentGeneration + ". Generation";
+            _generationDisplay.text = _field.Brain.FindQMatrix(_field.Goal).Generations + ". Generation";
             _aiAmountDisplay.text = "AIs on Field: " + _field.AisOnField;
             _aiAmountInGoalDisplay.text = "AIs in Goal: " + _field.AisFoundGoal;
         }
@@ -60,10 +68,12 @@ namespace de.chojo.WayFinder.Menu {
             _field.Learning = !_field.Learning;
             if (_field.Learning) {
                 ChangeColorOfButton(button, Color.green);
+                button.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Discovering";
                 return;
             }
 
-            ChangeColorOfButton(button, Color.red);
+            button.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Using Way Data";
+            ChangeColorOfButton(button, Color.blue);
         }
 
         public void ChangeColorOfButton(Button button, Color color) {
