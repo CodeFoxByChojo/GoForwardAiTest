@@ -8,10 +8,9 @@ using UnityEngine.Serialization;
 
 namespace de.chojo.WayFinder.Manager {
     public class Field : MonoBehaviour {
-        private float _heatMapRefreshTimer;
         private float _roundEndTimer;
 
-        private GameObject[,] _heatMap;
+        private HeatMap _heatMap;
 
 
         [Header("Game Setup")] [SerializeField]
@@ -77,16 +76,15 @@ namespace de.chojo.WayFinder.Manager {
 
             _roundEndTimer = _roundLength;
 
-            _heatMapRefreshTimer = _heatMapRefresh;
-
             Camera.main.transform.position =
                 new Vector3(_dimensions.x / 2, _dimensions.y / 2, Camera.main.transform.position.z);
 
             Application.targetFrameRate = 200;
             QualitySettings.vSyncCount = 0;
 
-            GenerateHeatMap();
-
+            _heatMap = new GameObject().AddComponent<HeatMap>();
+            _heatMap.GenerateHeatMap(_dimensions.x, _dimensions.y);
+            
             GenerateNewGoal(true, false);
         }
 
@@ -95,18 +93,12 @@ namespace de.chojo.WayFinder.Manager {
             UpdateMonitoring();
 
             _currentRoundDuration += Time.deltaTime;
-            _heatMapRefreshTimer -= Time.deltaTime;
             _roundEndTimer -= Time.deltaTime;
 
             if (_roundEndTimer < 0) {
                 ForceNewRound();
                 _roundEndTimer = _roundLength;
             }
-
-            if (_heatMapRefreshTimer > 0) return;
-            _heatMapRefreshTimer = _heatMapRefresh;
-
-            DrawHeatMap();
         }
 
 
@@ -116,96 +108,6 @@ namespace de.chojo.WayFinder.Manager {
         /// </summary>
         /// <param name="PlayerList"></param>
         /// <returns></returns>
-        private QMatrixMemory MergeQMatrixData(List<Player> PlayerList) {
-            List<QMatrixMemory> temp = new List<QMatrixMemory>();
-            foreach (var entry in PlayerList) {
-                temp.Add(entry.CurrentQMatrix);
-            }
-
-            var mergedMemory = Helper.AddListToList(temp, Brain.CollectedMemories);
-            var data = new QMatrixMemory(Goal);
-            for (var i = 0; i < _dimensions.x; i++) {
-                for (var j = 0; j < _dimensions.y; j++) {
-                    var up = new List<double>();
-                    var down = new List<double>();
-                    var right = new List<double>();
-                    var left = new List<double>();
-                    long visits = 0;
-
-                    foreach (var memory in mergedMemory) {
-                        up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
-                        down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
-                        right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
-                        left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
-                        visits += memory.QMatrix[i, j].Visits;
-                    }
-
-                    data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
-                    data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
-                    data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
-                    data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    data.QMatrix[i, j].Visits = visits;
-                }
-            }
-
-            return data;
-        }
-
-        /// <summary>
-        /// generate the heatmap at start
-        /// </summary>
-        private void GenerateHeatMap() {
-            _heatMap = new GameObject[_dimensions.x, _dimensions.y];
-            for (var i = 0; i < _dimensions.x; i++) {
-                for (var j = 0; j < _dimensions.y; j++) {
-                    var obj = Instantiate(_fieldFrame);
-                    obj.transform.SetParent(gameObject.transform);
-                    obj.transform.position = new Vector3(i, j, 1);
-                    obj.transform.GetComponent<Renderer>().material.color = new Color(1f, 0.92f, 0.99f);
-                    _heatMap[i, j] = obj;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Redraw the heatmap
-        /// </summary>
-        private void DrawHeatMap() {
-            var matrix = MergeQMatrixData(_players);
-            double highestValue = 0;
-
-            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    double fieldValue = 0;
-
-                    if (_heatMapType == HeatMapType.BestWay) {
-                        fieldValue = matrix.QMatrix[i, j].GetBestValue();
-                    }
-
-                    if (_heatMapType == HeatMapType.Visits) {
-                        fieldValue = matrix.QMatrix[i, j].Visits;
-                    }
-
-                    if (fieldValue > highestValue) highestValue = fieldValue;
-                }
-            }
-
-            
-            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    if (_heatMapType == HeatMapType.BestWay) {
-                        _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
-                    }
-
-                    if (_heatMapType == HeatMapType.Visits) {
-                        _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].Visits / highestValue);
-                    }
-                }
-            }
-        }
 
 
         //AI Knowledge Merging
@@ -361,7 +263,13 @@ namespace de.chojo.WayFinder.Manager {
             get { return _heatMapType; }
             set { _heatMapType = value; }
         }
-        
-        
+
+        public GameObject FieldFrame {
+            get { return _fieldFrame; }
+        }
+
+        public List<Player> Players {
+            get { return _players; }
+        }
     }
 }
