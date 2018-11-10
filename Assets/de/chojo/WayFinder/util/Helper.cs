@@ -284,6 +284,11 @@ public enum Directions {
     none
 }
 
+public enum HeatMapType{
+    BestWay,
+    Visits
+}
+
 public static class Data {
     private static readonly string _uiUpdateTag = "UiUpdateText";
 
