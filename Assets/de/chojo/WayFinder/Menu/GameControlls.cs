@@ -111,5 +111,13 @@ namespace de.chojo.WayFinder.Menu {
 
             return 0;
         }
+
+        public void ChangeHeatMapType(TMP_Dropdown dropdown) {
+            _field.HeatMapType = (HeatMapType) dropdown.value;
+        }
+
+        public void GenerateNewGoal() {
+            _field.GenerateNewGoal(false, true);
+        }
     }
 }
