@@ -85,7 +85,7 @@ namespace de.chojo.WayFinder.Manager {
 
             GenerateHeatMap();
 
-            StartNewRound();
+            GenerateNewGoal(true, false);
         }
 
 
@@ -209,13 +209,17 @@ namespace de.chojo.WayFinder.Manager {
         /// <summary>
         /// Triggers a new round with saving the data of ais, which are not in the goal.
         /// </summary>
-        [ContextMenu("EndRound")]
+        [
+            ContextMenu("EndRound")]
         public void ForceNewRound() {
-            foreach (var player in _players) {
-                player.SaveAndDestroy();
+            if (_players != null) {
+                foreach (var player in _players) {
+                    player.SaveAndDestroy();
+                }
+
+                _players.Clear();
             }
 
-            _players.Clear();
             StartNewRound();
         }
 
@@ -227,29 +231,44 @@ namespace de.chojo.WayFinder.Manager {
             _currentRoundDuration = 0;
 
             Brain.MergeAndSaveQMatrixData();
-            GenerateNewGoal();
             for (int i = 0;
                 i < _aIsPerRound;
                 i++) {
                 Instantiate(_aiObject, new Vector3(-1, -1, -1), new Quaternion());
             }
-
-            Debug.Log("New round started with " + _aIsPerRound + " Testsubjects!");
         }
 
         /// <summary>
         /// Generates a new Goal. Currently not used
         /// </summary>
-        public void GenerateNewGoal() {
-            //_goal = new Vector2Int(_dimensions.x,dimensions.y(_dimensions.x, _dimensions.y));
-            Goal = _goalInput;
-            RMatrix = new QMatrixMemory(Goal);
-            RMatrix.QMatrix[Goal.x - 1, Goal.y].SetValue(Directions.Right, 1);
-            RMatrix.QMatrix[Goal.x + 1, Goal.y].SetValue(Directions.Left, 1);
-            RMatrix.QMatrix[Goal.x, Goal.y - 1].SetValue(Directions.Up, 1);
-            RMatrix.QMatrix[Goal.x, Goal.y + 1].SetValue(Directions.Down, 1);
-            RMatrix.QMatrix[Goal.x, Goal.y].SetValue(Directions.none, 1);
+        public void GenerateNewGoal(bool load, bool newGoal) {
+            if (load) {
+                Goal = _goalInput;
+            }
+            else if (newGoal) {
+                Goal = new Vector2Int(UnityEngine.Random.Range(1, _dimensions.x - 1),
+                    UnityEngine.Random.Range(1, _dimensions.y - 1));
+            }
+
+            RMatrix = GenerateRMatrix(Goal);
+
             _goal.transform.position = new Vector3(Goal.x, Goal.y, 0);
+
+            Debug.Log("New goal is: " + Goal.x + "|" + Goal.y);
+
+            ForceNewRound();
+        }
+
+        private QMatrixMemory GenerateRMatrix(Vector2Int goal) {
+            QMatrixMemory memory = new QMatrixMemory(goal);
+
+            memory.QMatrix[goal.x - 1, goal.y].SetValue(Directions.Right, 1);
+            memory.QMatrix[goal.x + 1, goal.y].SetValue(Directions.Left, 1);
+            memory.QMatrix[goal.x, goal.y - 1].SetValue(Directions.Up, 1);
+            memory.QMatrix[goal.x, goal.y + 1].SetValue(Directions.Down, 1);
+            memory.QMatrix[goal.x, goal.y].SetValue(Directions.none, 1);
+
+            return memory;
         }
 
         private void UpdateMonitoring() {
