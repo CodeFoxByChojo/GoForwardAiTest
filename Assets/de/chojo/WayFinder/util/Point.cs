@@ -11,11 +11,15 @@ namespace de.chojo.WayFinder.util {
         private double _right = 0;
         private double _up = 0;
 
+        private long _visits = 0;
+
         public void SetValue(Directions direction, double value) {
+            _visits++;
+            
             if (double.IsNaN(value)) {
                 value = 0;
             }
-            
+
             switch (direction) {
                 case Directions.Up:
                     _up = value;
@@ -71,6 +75,11 @@ namespace de.chojo.WayFinder.util {
         public double GetBestValue() {
             List<double> temp = new List<double> {_up, _left, _down, _right, _none};
             return temp.Max();
+        }
+
+        public long Visits {
+            get { return _visits; }
+            set { _visits = value; }
         }
     }
 }
