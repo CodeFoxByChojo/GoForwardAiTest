@@ -39,6 +39,57 @@ namespace de.chojo.WayFinder.Manager {
             }
         }
 
+        private void MergeQMatrixDataAsync(bool init) {
+            if (init) {
+                List<QMatrixMemory> temp = new List<QMatrixMemory>();
+                List<Player> PlayerList = _field.Players;
+
+                foreach (var entry in PlayerList) {
+                    temp.Add(entry.CurrentQMatrix);
+                }
+
+                _memorysToMerge = Helper.AddListToList(temp, _field.Brain.CollectedMemories);
+            }
+
+            int mergeIndexGoal = _mergeIndex + mergesPerFrame;
+            int currentMergeIndex = _mergeIndex;
+
+            for (var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
+                for (var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
+                    var up = new List<double>();
+                    var down = new List<double>();
+                    var right = new List<double>();
+                    var left = new List<double>();
+                    long visits = 0;
+
+                    foreach (var memory in _memorysToMerge) {
+                        up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
+                        down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
+                        right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
+                        left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
+                        visits += memory.QMatrix[i, j].Visits;
+                    }
+
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
+                    _mergedMemory.QMatrix[i, j].Visits = visits;
+
+                    _mergeYIndex = j;
+                    
+                    currentMergeIndex++;
+                    if (currentMergeIndex > mergeIndexGoal) {
+                        return;
+                    }
+                }
+
+                _mergeXIndex = i;
+            }
+
+            _mergeInProgress = false;
+
+        }
 
         /// <summary>
         /// generate the heatmap at start
