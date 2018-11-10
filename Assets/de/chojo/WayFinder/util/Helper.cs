@@ -153,11 +153,11 @@ namespace de.chojo.WayFinder.util {
                 return blueToCyan.Evaluate(per);
             }
 
-            if (percent > 25 && percent <= 50) {
+            if (percent > 0.25f && percent <= 0.50f) {
                 return cyanToGreen.Evaluate(per);
             }
 
-            if (percent > 50 && percent <= 75) {
+            if (percent > 0.50f && percent <= 0.75f) {
                 return greenToYellow.Evaluate(per);
             }
 
