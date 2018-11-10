@@ -24,6 +24,8 @@ namespace de.chojo.WayFinder.Manager {
 
         [SerializeField] private float _roundLength = 30;
 
+        private HeatMapType _heatMapType = HeatMapType.BestWay;
+
         [Header("AI Controlls")] [SerializeField] [Range(1, 100)]
         private float _actionsPerSecond;
 
@@ -104,7 +106,7 @@ namespace de.chojo.WayFinder.Manager {
             if (_heatMapRefreshTimer > 0) return;
             _heatMapRefreshTimer = _heatMapRefresh;
 
-            DrawHeatmap();
+            DrawHeatMap();
         }
 
 
@@ -128,18 +130,21 @@ namespace de.chojo.WayFinder.Manager {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
+                    long visits = 0;
 
                     foreach (var memory in mergedMemory) {
                         up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
+                        visits += memory.QMatrix[i, j].Visits;
                     }
 
                     data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
                     data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
                     data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
                     data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
+                    data.QMatrix[i, j].Visits = visits;
                 }
             }
 
@@ -166,22 +171,39 @@ namespace de.chojo.WayFinder.Manager {
         /// <summary>
         /// Redraw the heatmap
         /// </summary>
-        private void DrawHeatmap() {
+        private void DrawHeatMap() {
             var matrix = MergeQMatrixData(_players);
             double highestValue = 0;
 
             for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
                 for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    var fieldValue = matrix.QMatrix[i, j].GetBestValue();
+                    double fieldValue = 0;
+
+                    if (_heatMapType == HeatMapType.BestWay) {
+                        fieldValue = matrix.QMatrix[i, j].GetBestValue();
+                    }
+
+                    if (_heatMapType == HeatMapType.Visits) {
+                        fieldValue = matrix.QMatrix[i, j].Visits;
+                    }
 
                     if (fieldValue > highestValue) highestValue = fieldValue;
                 }
             }
 
+            
             for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++)
-                    _heatMap[i, j].GetComponent<Renderer>().material.color =
-                        Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
+                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
+                    if (_heatMapType == HeatMapType.BestWay) {
+                        _heatMap[i, j].GetComponent<Renderer>().material.color =
+                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
+                    }
+
+                    if (_heatMapType == HeatMapType.Visits) {
+                        _heatMap[i, j].GetComponent<Renderer>().material.color =
+                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].Visits / highestValue);
+                    }
+                }
             }
         }
 
@@ -203,7 +225,6 @@ namespace de.chojo.WayFinder.Manager {
                 StartNewRound();
             }
         }
-
 
         //New Round
         /// <summary>
@@ -335,5 +356,12 @@ namespace de.chojo.WayFinder.Manager {
             get { return _aIsPerRound; }
             set { _aIsPerRound = value; }
         }
+
+        public HeatMapType HeatMapType {
+            get { return _heatMapType; }
+            set { _heatMapType = value; }
+        }
+        
+        
     }
 }
