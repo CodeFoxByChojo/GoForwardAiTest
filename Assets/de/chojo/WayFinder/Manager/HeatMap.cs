@@ -170,22 +170,84 @@ namespace de.chojo.WayFinder.Manager {
                     if (fieldValue > highestValue) highestValue = fieldValue;
                 }
             }
+        private void DrawHeatMapAsync() {
+            int drawIndex = 0;
+
+            if (!_findHighestValue) {
+                for (var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
+                    for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
+                        decimal fieldValue = 0;
+                        if (_heatMapType == HeatMapType.BestWay) {
+                            fieldValue = (decimal) _mergedMemory.QMatrix[i, j].GetBestValue();
+                        }
+
+                        if (_heatMapType == HeatMapType.Visits) {
+                            fieldValue = _mergedMemory.QMatrix[i, j].Visits;
+                        }
+
+                        if (fieldValue > _highestValue) _highestValue = fieldValue;
 
 
-            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    if (_field.HeatMapType == HeatMapType.BestWay) {
-                _gameControlls.Log("Found Highest Value (" + _highestValue + "). Starting draw of Heat Map");
-                        _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
+                        _drawYIndex = j;
+                        drawIndex++;
+                        if (drawIndex > _drawsPerFrame) {
+                            if (j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
+                                _drawXIndex++;
+                                _drawYIndex = 0;
+                                return;
+                            }
+
+                            _drawYIndex++;
+                            return;
+                        }
                     }
 
-                    if (_field.HeatMapType == HeatMapType.Visits) {
+                    _drawYIndex = 0;
+
+                    _drawXIndex = i;
+                }
+
+
+                _gameControlls.Log("Found Highest Value (" + _highestValue + "). Starting draw of Heat Map");
+                _drawXIndex = _drawYIndex = 0;
+                _findHighestValue = true;
+                return;
+            }
+
+
+            for (var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
+                for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
+                    if (_heatMapType == HeatMapType.BestWay) {
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(matrix.QMatrix[i, j].Visits / highestValue);
+                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].GetBestValue(), _highestValue);
+                    }
+
+                    if (_heatMapType == HeatMapType.Visits) {
+                        _heatMap[i, j].GetComponent<Renderer>().material.color =
+                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].Visits, _highestValue);
+                    }
+
+                    _drawYIndex = j;
+                    drawIndex++;
+                    if (drawIndex > _drawsPerFrame) {
+                        if (j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
+                            _drawXIndex++;
+                            _drawYIndex = 0;
+                            return;
+                        }
+
+                        _drawYIndex++;
+                        return;
                     }
                 }
+
+                _drawYIndex = 0;
+
+                _drawXIndex = i;
             }
+
+            _drawXIndex = _drawYIndex = 0;
+            _mergeDone = _findHighestValue = false;
             _gameControlls.Log("Async Heat Map draw done. Starting new Data Merge. Merging " + _mergesPerFrame +
                                " records per frame");
         }
