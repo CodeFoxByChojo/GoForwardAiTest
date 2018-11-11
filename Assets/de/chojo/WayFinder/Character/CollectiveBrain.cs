@@ -66,14 +66,14 @@ namespace de.chojo.WayFinder.Character {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    BigInteger visits = 0;
+                    var visits = new List<BigInteger>();
 
                     foreach (var player in _collectedMemories) {
                         up.Add(player.QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(player.QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(player.QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(player.QMatrix[i, j].GetValue(Directions.Left));
-                        visits += player.QMatrix[i, j].Visits;
+                        visits.Add(player.QMatrix[i, j].Visits);
                     }
 
 
@@ -81,7 +81,7 @@ namespace de.chojo.WayFinder.Character {
                     data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
                     data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
                     data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    data.QMatrix[i, j].Visits = visits;
+                    data.QMatrix[i, j].Visits = Helper.GetAverage(visits);
                 }
             }
 
