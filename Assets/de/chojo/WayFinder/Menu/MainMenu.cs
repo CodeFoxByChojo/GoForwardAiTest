@@ -4,6 +4,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace de.chojo.WayFinder.Menu {
@@ -16,6 +17,24 @@ namespace de.chojo.WayFinder.Menu {
         private int _goalX = 5;
         private int _goalY = 5;
 
+        [SerializeField] private TMP_InputField _dimensionXDisplay;
+        [SerializeField] private TMP_InputField _dimensionYDisplay;
+        [SerializeField] private TMP_InputField _goalXDisplay;
+        [SerializeField] private TMP_InputField _goalYDisplay;
+        [SerializeField] private Slider _aiAmountSlider;
+        [SerializeField] private Slider _aiActionSlider;
+        [SerializeField] private Slider _roundDurationSlider;
+
+        private void Start() {
+            _dimensionXDisplay.text = _dimensionX.ToString();
+            _dimensionYDisplay.text = _dimensionY.ToString();
+            _goalXDisplay.text = _goalX.ToString();
+            _goalYDisplay.text = _goalY.ToString();
+            AiAmountChanged(_aiAmountSlider);
+            RoundDurationChanged(_roundDurationSlider);
+            AiActionsPerSecondChanged(_aiActionSlider);
+        }
+
         public void StartGame() {
             PlayerPrefsHandler.SetAiAmount(_aiAmount);
             PlayerPrefsHandler.SetRoundDuration(_roundDuration);
@@ -25,7 +44,6 @@ namespace de.chojo.WayFinder.Menu {
             PlayerPrefsHandler.SetGoalX(_goalX);
             PlayerPrefsHandler.SetGoalY(_goalY);
             SceneManager.LoadSceneAsync(1);
-            Debug.Log(PlayerPrefsHandler.GetAiAmount().ToString() + PlayerPrefsHandler.GetDimensionX());
         }
 
         public void AiAmountChanged(Slider slider) {
@@ -40,39 +58,38 @@ namespace de.chojo.WayFinder.Menu {
             _aiActionsPerSecond = GetFloatAndSetTextForSliderWithTag(slider, tag);
         }
 
-        public void DimensionsXChanged(TextMeshProUGUI text) {
+        public void DimensionsXChanged(TMP_InputField text) {
             bool changed;
-            var value = Helper.ClampInt(Helper.StringToInt(text.text), 10, 250, out changed);
+            var value = Helper.ClampInt(Helper.StringToInt(text.text,1), 10, 250, out changed);
             //TODO: Error Message
             _dimensionX = value;
-            text.text = value.ToString();
+            _dimensionXDisplay.text = value.ToString();
             _goalX = Helper.ClampInt(_goalX, 0, _dimensionX, out changed);
         }
 
-        public void DimensionsYChanged(TextMeshProUGUI text) {
+        public void DimensionsYChanged(TMP_InputField text) {
             bool changed;
-            var value = Helper.ClampInt(Helper.StringToInt(text.text), 10, 250, out changed);
+            var value = Helper.ClampInt(Helper.StringToInt(text.text,1), 10, 250, out changed);
             //TODO: Error Message
             _dimensionY = value;
-            text.text = value.ToString();
+            _dimensionYDisplay.text = value.ToString();
             _goalY = Helper.ClampInt(_goalY, 0, _dimensionY, out changed);
         }
 
-        public void GoalXChanged(TextMeshProUGUI text) {
+        public void GoalXChanged(TMP_InputField text) {
             bool changed;
-            var value = Helper.ClampInt(Helper.StringToInt(text.text), 1, _dimensionX - 1, out changed);
+            var value = Helper.ClampInt(Helper.StringToInt(text.text,1), 1, _dimensionX - 1, out changed);
             //TODO: Error Message
             _goalX = value;
-            text.text = value.ToString();
+            _goalXDisplay.text = value.ToString();
         }
 
-        public void GoalYChanged(TextMeshProUGUI text) {
+        public void GoalYChanged(TMP_InputField text) {
             bool changed;
-            var value = Helper.ClampInt(Helper.StringToInt(text.text), 1, _dimensionY - 1, out changed);
+            var value = Helper.ClampInt(Helper.StringToInt(text.text,1), 1, _dimensionY - 1, out changed);
             //TODO: Error Message
             _goalX = value;
-            Debug.Log("Set Goal Y to: " + value);
-            text.text = value.ToString();
+            _goalYDisplay.text = value.ToString();
         }
 
         private float GetFloatAndSetTextForSliderWithTag(Slider slider, string tag) {
