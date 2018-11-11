@@ -61,7 +61,7 @@ namespace de.chojo.WayFinder.util {
             return serializedArray;
         }
 
-        
+
         /// <summary>
         /// Fills a string with an amount of spaces
         /// </summary>
@@ -96,7 +96,7 @@ namespace de.chojo.WayFinder.util {
             if (double.IsNaN(result)) {
                 result = 0;
             }
-            
+
             return result;
         }
 
@@ -208,6 +208,7 @@ namespace de.chojo.WayFinder.util {
 
             return null;
         }
+
         public static GameObject GetObjectWithTag(IEnumerable<GameObject> gameObjects, string tag) {
             foreach (var entry in gameObjects) {
                 if (entry.tag.Equals(tag)) {
@@ -235,7 +236,7 @@ namespace de.chojo.WayFinder.util {
 
             return 0;
         }
-        
+
         /// <summary>
         /// Converts a string to float. Rounds to two digits. 
         /// </summary>
@@ -252,7 +253,7 @@ namespace de.chojo.WayFinder.util {
 
             return 0;
         }
-        
+
         /// <summary>
         /// Converts string to Integer.
         /// </summary>
@@ -295,7 +296,7 @@ namespace de.chojo.WayFinder.util {
             if (value < min) return min;
             return value;
         }
-        
+
     }
 }
 
@@ -316,7 +317,7 @@ public enum Directions {
     none
 }
 
-public enum HeatMapType{
+public enum HeatMapType {
     BestWay,
     Visits
 }

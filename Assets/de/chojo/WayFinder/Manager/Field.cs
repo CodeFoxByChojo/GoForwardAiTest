@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using de.chojo.WayFinder.Character;
+using de.chojo.WayFinder.Menu;
 using de.chojo.WayFinder.util;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -87,7 +88,7 @@ namespace de.chojo.WayFinder.Manager {
             QualitySettings.vSyncCount = 0;
 
             _heatMap = new GameObject().AddComponent<HeatMap>();
-            _heatMap.GenerateHeatMap(_dimensions.x, _dimensions.y);
+            _heatMap.GenerateHeatMap(_dimensions.x, _dimensions.y, _fieldFrame);
             
             GenerateNewGoal(true, false);
         }
@@ -107,13 +108,6 @@ namespace de.chojo.WayFinder.Manager {
 
 
         //Visualisierung
-        /// <summary>
-        /// Merge the current matrix data for the heat map
-        /// </summary>
-        /// <param name="PlayerList"></param>
-        /// <returns></returns>
-
-
         //AI Knowledge Merging
         /// <summary>
         /// Removes the player from the list, save and destroy.

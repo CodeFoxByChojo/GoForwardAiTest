@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using de.chojo.WayFinder.Character;
+using de.chojo.WayFinder.Menu;
 using de.chojo.WayFinder.util;
+using UnityEditor;
 using UnityEngine;
 
 namespace de.chojo.WayFinder.Manager {

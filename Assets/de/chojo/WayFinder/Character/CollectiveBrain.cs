@@ -65,7 +65,7 @@ namespace de.chojo.WayFinder.Character {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    long visits = 0;
+                    decimal visits = 0;
 
                     foreach (var player in _collectedMemories) {
                         up.Add(player.QMatrix[i, j].GetValue(Directions.Up));
