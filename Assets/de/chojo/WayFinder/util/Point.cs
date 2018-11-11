@@ -11,10 +11,10 @@ namespace de.chojo.WayFinder.util {
         private double _right = 0;
         private double _up = 0;
 
-        private long _visits = 0;
+        private decimal _visits = 0;
 
         public void SetValue(Directions direction, double value) {
-            _visits++;
+            _visits += (decimal) 0.0000000001;
             
             if (double.IsNaN(value)) {
                 value = 0;
@@ -77,7 +77,7 @@ namespace de.chojo.WayFinder.util {
             return temp.Max();
         }
 
-        public long Visits {
+        public decimal Visits {
             get { return _visits; }
             set { _visits = value; }
         }
