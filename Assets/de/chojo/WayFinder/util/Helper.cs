@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -290,6 +291,7 @@ namespace de.chojo.WayFinder.util {
             changed = false;
             return value;
         }
+
         public static float ClampFloat(float value, float min, float max) {
             if (value > max) return max;
             if (value < min) return min;
@@ -302,6 +304,35 @@ namespace de.chojo.WayFinder.util {
             return value;
         }
 
+        public static Vector2Int GetNewCoordVector2(Vector2Int pos, Directions direction) {
+            switch (direction) {
+                case Directions.Up:
+                    return new Vector2Int(pos.x, pos.y + 1);
+                case Directions.Down:
+                    return new Vector2Int(pos.x, pos.y - 1);
+                case Directions.Right:
+                    return new Vector2Int(pos.x + 1, pos.y);
+                case Directions.Left:
+                    return new Vector2Int(pos.x - 1, pos.y);
+                default:
+                    throw new ArgumentOutOfRangeException("direction", direction, null);
+            }
+        }
+
+        public static Vector3Int GetNewCoordVector3(Vector3Int pos, Directions direction) {
+            switch (direction) {
+                case Directions.Up:
+                    return new Vector3Int(pos.x, pos.y + 1, pos.z);
+                case Directions.Down:
+                    return new Vector3Int(pos.x, pos.y - 1, pos.z);
+                case Directions.Right:
+                    return new Vector3Int(pos.x + 1, pos.y, pos.z);
+                case Directions.Left:
+                    return new Vector3Int(pos.x - 1, pos.y, pos.z);
+                default:
+                    throw new ArgumentOutOfRangeException("direction", direction, null);
+            }
+        }
     }
 }
 
