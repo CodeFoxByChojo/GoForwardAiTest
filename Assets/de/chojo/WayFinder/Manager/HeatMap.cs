@@ -34,6 +34,12 @@ namespace de.chojo.WayFinder.Manager {
         private int _drawsPerFrame = 100;
         private int _valueChecksPerFrame;
 
+        List<double> up = new List<double>();
+        List<double> down = new List<double>();
+        List<double> right = new List<double>();
+        List<double> left = new List<double>();
+        List<BigInteger> visits = new List<BigInteger>();
+
 
         private void Start() {
             _field = Field.GetInstance();
@@ -111,18 +117,12 @@ namespace de.chojo.WayFinder.Manager {
             int mergeIndex = 0;
             for (var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
                 for (var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
-                    var up = new List<double>();
-                    var down = new List<double>();
-                    var right = new List<double>();
-                    var left = new List<double>();
-                    BigInteger visits = 0;
-
                     for (int k = _mergePointIndex; k < _memorysToMerge.Count; k++) {
                         up.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Left));
-                        visits += _memorysToMerge[k].QMatrix[i, j].Visits;
+                        visits.Add(_memorysToMerge[k].QMatrix[i, j].Visits);
                         mergeIndex++;
                         if (mergeIndex > _mergesPerFrame) {
                             _mergePointIndex++;
@@ -136,7 +136,13 @@ namespace de.chojo.WayFinder.Manager {
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    _mergedMemory.QMatrix[i, j].Visits = visits;
+                    _mergedMemory.QMatrix[i, j].Visits = Helper.GetAverage(visits);
+
+                    up = new List<double>();
+                    down = new List<double>();
+                    right = new List<double>();
+                    left = new List<double>();
+                    visits = new List<BigInteger>();
 
                     _mergeYIndex = j;
 
