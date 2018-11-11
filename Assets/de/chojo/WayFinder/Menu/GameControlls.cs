@@ -40,9 +40,8 @@ namespace de.chojo.WayFinder.Menu {
         }
 
         private GameControlls() {
-            
         }
-        
+
         public static GameControlls GetInstance() {
             return FindObjectOfType<GameControlls>();
         }
@@ -68,16 +67,15 @@ namespace de.chojo.WayFinder.Menu {
         private void UpdateLog() {
             string text = "";
             foreach (var entry in log) {
-                text = string.Concat(text,
-                    "[" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + "] | " +
-                    entry + Environment.NewLine);
+                text = string.Concat(text, entry + Environment.NewLine);
             }
 
             _logText.text = text;
         }
 
         public void Log(string text) {
-            log.Add(text);
+            log.Add("[" + DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString() + ":" +
+                    DateTime.Now.Second.ToString() + "] | " + text);
             if (log.Count > 30) {
                 log.RemoveAt(0);
             }
