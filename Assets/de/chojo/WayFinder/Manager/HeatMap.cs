@@ -200,21 +200,21 @@ namespace de.chojo.WayFinder.Manager {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    BigInteger visits = 0;
+                    var visits = new List<BigInteger>();
 
                     foreach (var memory in mergedMemory) {
                         up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
-                        visits += memory.QMatrix[i, j].Visits;
+                        visits.Add(memory.QMatrix[i, j].Visits);
                     }
 
                     data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
                     data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
                     data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
                     data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    data.QMatrix[i, j].Visits = visits;
+                    data.QMatrix[i, j].Visits = Helper.GetAverage(visits);
                 }
             }
 
@@ -241,7 +241,6 @@ namespace de.chojo.WayFinder.Manager {
                         var visitValue = matrix.QMatrix[i, j].Visits;
                         if (visitValue > highestVisitValue) highestVisitValue = visitValue;
                     }
-
                 }
             }
         }
@@ -263,10 +262,9 @@ namespace de.chojo.WayFinder.Manager {
                         }
 
 
-
                         _drawYIndex = j;
                         drawIndex++;
-                        if (drawIndex > _drawsPerFrame) {
+                        if (drawIndex > _mergesPerFrame) {
                             if (j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
                                 _drawXIndex++;
                                 _drawYIndex = 0;

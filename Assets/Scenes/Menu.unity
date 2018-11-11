@@ -139,8 +139,8 @@ Transform:
   m_LocalScale: {x: 0.99999183, y: 0.99999183, z: 0.99999183}
   m_Children:
   - {fileID: 1820501895}
-  - {fileID: 525632214}
   - {fileID: 1119558397}
+  - {fileID: 525632214}
   m_Father: {fileID: 160692267}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -268,10 +268,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 160692267}
+  - component: {fileID: 160692263}
   - component: {fileID: 160692266}
   - component: {fileID: 160692265}
   - component: {fileID: 160692264}
-  - component: {fileID: 160692263}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -290,6 +290,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6b5662f2e7a43ab921f8d90a62f556e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dimensionXDisplay: {fileID: 343014374}
+  _dimensionYDisplay: {fileID: 1049367408}
+  _goalXDisplay: {fileID: 1119558398}
+  _goalYDisplay: {fileID: 525632215}
+  _aiAmountSlider: {fileID: 329247256}
+  _aiActionSlider: {fileID: 428814813}
+  _roundDurationSlider: {fileID: 1494964122}
 --- !u!114 &160692264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -896,7 +903,7 @@ RectTransform:
   m_Children:
   - {fileID: 1435666523}
   m_Father: {fileID: 762518212}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -962,8 +969,8 @@ MonoBehaviour:
         m_MethodName: DimensionsXChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 388812509}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 343014374}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -988,8 +995,8 @@ MonoBehaviour:
         m_MethodName: DimensionsXChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 388812509}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 343014374}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1291,7 +1298,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
   - {fileID: 0}
@@ -1751,7 +1758,7 @@ RectTransform:
   m_Children:
   - {fileID: 86115448}
   m_Father: {fileID: 45642568}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1817,8 +1824,8 @@ MonoBehaviour:
         m_MethodName: GoalYChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 825770924}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 525632215}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1843,8 +1850,8 @@ MonoBehaviour:
         m_MethodName: GoalYChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 825770924}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 525632215}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2403,8 +2410,8 @@ Transform:
   m_LocalScale: {x: 0.99999183, y: 0.99999183, z: 0.99999183}
   m_Children:
   - {fileID: 248245910}
-  - {fileID: 1049367407}
   - {fileID: 343014373}
+  - {fileID: 1049367407}
   m_Father: {fileID: 160692267}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2590,7 +2597,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
   - {fileID: 0}
@@ -2995,7 +3002,7 @@ RectTransform:
   m_Children:
   - {fileID: 632910567}
   m_Father: {fileID: 762518212}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3061,8 +3068,8 @@ MonoBehaviour:
         m_MethodName: DimensionsYChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1708832169}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 1049367408}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3087,8 +3094,8 @@ MonoBehaviour:
         m_MethodName: DimensionsYChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1708832169}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 1049367408}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3118,12 +3125,12 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
-  m_RichText: 1
+  m_RichText: 0
   m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
-  m_RestoreOriginalTextOnEscape: 1
-  m_isRichTextEditingAllowed: 1
+  m_RestoreOriginalTextOnEscape: 0
+  m_isRichTextEditingAllowed: 0
   m_InputValidator: {fileID: 0}
 --- !u!114 &1049367409
 MonoBehaviour:
@@ -3363,7 +3370,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
   - {fileID: 0}
@@ -3482,7 +3489,7 @@ RectTransform:
   m_Children:
   - {fileID: 777178707}
   m_Father: {fileID: 45642568}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3548,8 +3555,8 @@ MonoBehaviour:
         m_MethodName: GoalXChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1056551218}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 1119558398}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3574,8 +3581,8 @@ MonoBehaviour:
         m_MethodName: GoalXChanged
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1056551218}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TextMeshProUGUI, Unity.TextMeshPro
+          m_ObjectArgument: {fileID: 1119558398}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4342,7 +4349,7 @@ MonoBehaviour:
   m_MinValue: 10
   m_MaxValue: 120
   m_WholeNumbers: 1
-  m_Value: 50
+  m_Value: 30
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -4775,7 +4782,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 1
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -4804,7 +4811,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
   - {fileID: 0}
