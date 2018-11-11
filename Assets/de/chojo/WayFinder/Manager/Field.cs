@@ -46,6 +46,8 @@ namespace de.chojo.WayFinder.Manager {
 
         [SerializeField] private GameObject _fieldFrame;
 
+        private GameControlls _gameControlls;
+
         public static Field GetInstance() {
             return FindObjectOfType<Field>();
         }
@@ -71,6 +73,8 @@ namespace de.chojo.WayFinder.Manager {
 
         private void Start() {
             LoadPlayerPrefs();
+            
+            _gameControlls = GameControlls.GetInstance();
 
             Brain = new CollectiveBrain();
 
@@ -159,6 +163,7 @@ namespace de.chojo.WayFinder.Manager {
                 i++) {
                 Instantiate(_aiObject, new Vector3(-1, -1, -1), new Quaternion());
             }
+            _gameControlls.Log("Start new Round");
         }
 
         /// <summary>
@@ -177,7 +182,7 @@ namespace de.chojo.WayFinder.Manager {
 
             _goal.transform.position = new Vector3(Goal.x, Goal.y, 0);
 
-            Debug.Log("New goal is: " + Goal.x + "|" + Goal.y);
+            _gameControlls.Log("New goal is: " + Goal.x + "|" + Goal.y);
 
             ForceNewRound();
         }

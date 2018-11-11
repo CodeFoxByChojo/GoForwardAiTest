@@ -7,6 +7,7 @@ namespace de.chojo.WayFinder.Manager {
     public class HeatMap : MonoBehaviour {
         private Field _field;
         private GameObject[,] _heatMap;
+        private GameControlls _gameControlls;
 
         private bool _mergeInProgress = false;
         private QMatrixMemory _mergedMemory;
@@ -24,6 +25,7 @@ namespace de.chojo.WayFinder.Manager {
 
         private void Start() {
             _field = Field.GetInstance();
+            _gameControlls = GameControlls.GetInstance();
             _mergeIndex = 0;
             _mergeInProgress = true;
         }
@@ -53,6 +55,9 @@ namespace de.chojo.WayFinder.Manager {
 
             int mergeIndexGoal = _mergeIndex + mergesPerFrame;
             int currentMergeIndex = _mergeIndex;
+                _gameControlls.Log("Async matrix merge in progress. Trying to merge " + _memorysToMerge.Count +
+                                   " records");
+                return;
 
             for (var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
                 for (var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
@@ -170,6 +175,7 @@ namespace de.chojo.WayFinder.Manager {
             for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
                 for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
                     if (_field.HeatMapType == HeatMapType.BestWay) {
+                _gameControlls.Log("Found Highest Value (" + _highestValue + "). Starting draw of Heat Map");
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
                             Helper.GetPercentAsColor(matrix.QMatrix[i, j].GetBestValue() / highestValue);
                     }
@@ -180,6 +186,8 @@ namespace de.chojo.WayFinder.Manager {
                     }
                 }
             }
+            _gameControlls.Log("Async Heat Map draw done. Starting new Data Merge. Merging " + _mergesPerFrame +
+                               " records per frame");
         }
     }
 }
