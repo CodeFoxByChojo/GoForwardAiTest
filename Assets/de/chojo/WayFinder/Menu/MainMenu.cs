@@ -39,10 +39,10 @@ namespace de.chojo.WayFinder.Menu {
             PlayerPrefsHandler.SetAiAmount(_aiAmount);
             PlayerPrefsHandler.SetRoundDuration(_roundDuration);
             PlayerPrefsHandler.SetAiActionsPerSecond(_aiActionsPerSecond);
-            PlayerPrefsHandler.SetDimensionX(_dimensionX);
-            PlayerPrefsHandler.SetDimensionY(_dimensionY);
-            PlayerPrefsHandler.SetGoalX(_goalX);
-            PlayerPrefsHandler.SetGoalY(_goalY);
+            PlayerPrefsHandler.SetDimensionX(Helper.StringToInt(_dimensionXDisplay.text,0));
+            PlayerPrefsHandler.SetDimensionY(Helper.StringToInt(_dimensionYDisplay.text,0));
+            PlayerPrefsHandler.SetGoalX(Helper.StringToInt(_goalXDisplay.text,0));
+            PlayerPrefsHandler.SetGoalY(Helper.StringToInt(_goalYDisplay.text,0));
             SceneManager.LoadSceneAsync(1);
         }
 
