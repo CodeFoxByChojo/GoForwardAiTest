@@ -120,6 +120,11 @@ namespace de.chojo.WayFinder.util {
             return GetPercentAsColor(value / maxValue);
         }
 
+        public static Color GetPercentAsColor(BigInteger value, BigInteger maxValue) {
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) (value / maxValue));
+        }
+
 
         private static Color GetPercentAsColor(Decimal percent) {
             float per;

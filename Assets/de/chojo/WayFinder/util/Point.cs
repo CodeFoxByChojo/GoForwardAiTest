@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Numerics;
 
 namespace de.chojo.WayFinder.util {
     public class Point {
@@ -11,10 +12,10 @@ namespace de.chojo.WayFinder.util {
         private double _right = 0;
         private double _up = 0;
 
-        private decimal _visits = 0;
+        private BigInteger _visits = 0;
 
         public void SetValue(Directions direction, double value) {
-            _visits += (decimal) 0.0000000001;
+            _visits++;
             
             if (double.IsNaN(value)) {
                 value = 0;
@@ -77,7 +78,7 @@ namespace de.chojo.WayFinder.util {
             return temp.Max();
         }
 
-        public decimal Visits {
+        public BigInteger Visits {
             get { return _visits; }
             set { _visits = value; }
         }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using de.chojo.WayFinder.util;
 using UnityEngine;
 
@@ -65,7 +66,7 @@ namespace de.chojo.WayFinder.Character {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    decimal visits = 0;
+                    BigInteger visits = 0;
 
                     foreach (var player in _collectedMemories) {
                         up.Add(player.QMatrix[i, j].GetValue(Directions.Up));

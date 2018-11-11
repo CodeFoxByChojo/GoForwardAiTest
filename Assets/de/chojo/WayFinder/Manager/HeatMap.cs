@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Numerics;
 using de.chojo.WayFinder.Character;
 using de.chojo.WayFinder.Menu;
 using de.chojo.WayFinder.util;
 using UnityEditor;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace de.chojo.WayFinder.Manager {
     public class HeatMap : MonoBehaviour {
@@ -25,7 +27,8 @@ namespace de.chojo.WayFinder.Manager {
 
         private bool _drawInProgress = false;
         private bool _findHighestValue = false;
-        private decimal _highestValue = 0;
+        private BigInteger _highestVisitValue;
+        private double _highestWayValue;
         private int _drawXIndex;
         private int _drawYIndex;
         private int _drawsPerFrame = 100;
@@ -98,7 +101,7 @@ namespace de.chojo.WayFinder.Manager {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    decimal visits = 0;
+                    BigInteger visits = 0;
 
                     for (int k = _mergePointIndex; k < _memorysToMerge.Count; k++) {
                         up.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Up));
@@ -177,7 +180,7 @@ namespace de.chojo.WayFinder.Manager {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    decimal visits = 0;
+                    BigInteger visits = 0;
 
                     foreach (var memory in mergedMemory) {
                         up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
@@ -204,21 +207,21 @@ namespace de.chojo.WayFinder.Manager {
         /// </summary>
         private void DrawHeatMapSync() {
             var matrix = _mergedMemory;
-            decimal highestValue = 0;
+            BigInteger highestVisitValue = 0;
+            double highestWayValue = 0;
 
             for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
                 for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    decimal fieldValue = 0;
-
                     if (_heatMapType == HeatMapType.BestWay) {
-                        fieldValue = (decimal) matrix.QMatrix[i, j].GetBestValue();
+                        var wayValue = matrix.QMatrix[i, j].GetBestValue();
+                        if (wayValue > highestWayValue) highestWayValue = wayValue;
                     }
 
                     if (_heatMapType == HeatMapType.Visits) {
-                        fieldValue = matrix.QMatrix[i, j].Visits;
+                        var visitValue = matrix.QMatrix[i, j].Visits;
+                        if (visitValue > highestVisitValue) highestVisitValue = visitValue;
                     }
 
-                    if (fieldValue > highestValue) highestValue = fieldValue;
                 }
             }
         }
@@ -229,16 +232,16 @@ namespace de.chojo.WayFinder.Manager {
             if (!_findHighestValue) {
                 for (var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
                     for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
-                        decimal fieldValue = 0;
                         if (_heatMapType == HeatMapType.BestWay) {
-                            fieldValue = (decimal) _mergedMemory.QMatrix[i, j].GetBestValue();
+                            var wayValue = _mergedMemory.QMatrix[i, j].GetBestValue();
+                            if (wayValue > _highestWayValue) _highestWayValue = wayValue;
                         }
 
                         if (_heatMapType == HeatMapType.Visits) {
-                            fieldValue = _mergedMemory.QMatrix[i, j].Visits;
+                            var visitValue = _mergedMemory.QMatrix[i, j].Visits;
+                            if (visitValue > _highestVisitValue) _highestVisitValue = visitValue;
                         }
 
-                        if (fieldValue > _highestValue) _highestValue = fieldValue;
 
 
                         _drawYIndex = j;
@@ -261,7 +264,7 @@ namespace de.chojo.WayFinder.Manager {
                 }
 
 
-                _gameControlls.Log("Found Highest Value (" + _highestValue + "). Starting draw of Heat Map");
+                _gameControlls.Log("Found Highest Value (" + _highestVisitValue + "). Starting draw of Heat Map");
                 _drawXIndex = _drawYIndex = 0;
                 _findHighestValue = true;
                 return;
@@ -272,12 +275,12 @@ namespace de.chojo.WayFinder.Manager {
                 for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
                     if (_heatMapType == HeatMapType.BestWay) {
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].GetBestValue(), _highestValue);
+                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].GetBestValue(), _highestWayValue);
                     }
 
                     if (_heatMapType == HeatMapType.Visits) {
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].Visits, _highestValue);
+                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].Visits, _highestVisitValue);
                     }
 
                     _drawYIndex = j;
