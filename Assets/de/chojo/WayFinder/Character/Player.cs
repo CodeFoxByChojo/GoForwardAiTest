@@ -30,6 +30,11 @@ namespace de.chojo.WayFinder.Character {
 
             _actionCounterCounter = 1 / _field.ActionsPerSecond;
             CurrentQMatrix = brain.FindQMatrix(_field.Goal);
+
+            if (WayBlocked(Directions.Up) && WayBlocked(Directions.Down) && WayBlocked(Directions.Left) &&
+                WayBlocked(Directions.Right)) {
+                _field.RemovePlayer(this);
+            }
         }
 
         private void Update() {
@@ -113,6 +118,12 @@ namespace de.chojo.WayFinder.Character {
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         private bool WayBlocked(Directions direction) {
+            if (_field.IsBlocked(
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), direction))) {
+                return true;
+            }
+
             switch (direction) {
                 case Directions.Up:
                     return _characterPosition.CurrentPos.y + 1 > _field.Dimensions.y - 1;
