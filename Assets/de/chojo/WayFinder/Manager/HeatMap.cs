@@ -41,39 +41,56 @@ namespace de.chojo.WayFinder.Manager {
             }
         }
 
-        private void MergeQMatrixDataAsync(bool init) {
-            if (init) {
-                List<QMatrixMemory> temp = new List<QMatrixMemory>();
-                List<Player> PlayerList = _field.Players;
+        private void MergeQMatrixDataAsync() {
+            if (!_mergeInProgress) {
+                List<QMatrixMemory> tempPlayer = new List<QMatrixMemory>();
+                _mergedMemory = new QMatrixMemory(_field.Goal);
 
-                foreach (var entry in PlayerList) {
-                    temp.Add(entry.CurrentQMatrix);
+                _heatMapType = _field.HeatMapType;
+
+                if (_field.Players == null) return;
+
+                foreach (var entry in _field.Players) {
+                    tempPlayer.Add(entry.CurrentQMatrix);
                 }
 
-                _memorysToMerge = Helper.AddListToList(temp, _field.Brain.CollectedMemories);
-            }
+                if (_field.Brain.CollectedMemories == null) {
+                    _memorysToMerge = new List<QMatrixMemory>(tempPlayer);
+                }
+                else {
+                    _memorysToMerge = Helper.AddListToList(tempPlayer,
+                        new List<QMatrixMemory>(_field.Brain.CollectedMemories));
+                }
 
-            int mergeIndexGoal = _mergeIndex + mergesPerFrame;
-            int currentMergeIndex = _mergeIndex;
+                _mergeInProgress = true;
                 _gameControlls.Log("Async matrix merge in progress. Trying to merge " + _memorysToMerge.Count +
                                    " records");
                 return;
+            }
 
+            int mergeIndex = 0;
             for (var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
                 for (var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
                     var up = new List<double>();
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    long visits = 0;
+                    decimal visits = 0;
 
-                    foreach (var memory in _memorysToMerge) {
-                        up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
-                        down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
-                        right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
-                        left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
-                        visits += memory.QMatrix[i, j].Visits;
+                    for (int k = _mergePointIndex; k < _memorysToMerge.Count; k++) {
+                        up.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Up));
+                        down.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Down));
+                        right.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Right));
+                        left.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Left));
+                        visits += _memorysToMerge[k].QMatrix[i, j].Visits;
+                        mergeIndex++;
+                        if (mergeIndex > _mergesPerFrame) {
+                            _mergePointIndex++;
+                            return;
+                        }
                     }
+
+                    _mergePointIndex = 0;
 
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
@@ -82,18 +99,29 @@ namespace de.chojo.WayFinder.Manager {
                     _mergedMemory.QMatrix[i, j].Visits = visits;
 
                     _mergeYIndex = j;
-                    
-                    currentMergeIndex++;
-                    if (currentMergeIndex > mergeIndexGoal) {
+
+                    mergeIndex++;
+                    if (mergeIndex > _mergesPerFrame) {
+                        if (j + 1 >= _field.Dimensions.y) {
+                            _mergeXIndex++;
+                            _mergeYIndex = 0;
+                            return;
+                        }
+
+                        _mergeYIndex++;
                         return;
                     }
                 }
 
+                _mergeYIndex = 0;
+
                 _mergeXIndex = i;
             }
 
+            _gameControlls.Log("Merge Done. Trying to find Highest Value.");
+            _mergeXIndex = _mergeYIndex = 0;
             _mergeInProgress = false;
-
+            _mergeDone = true;
         }
 
         /// <summary>
