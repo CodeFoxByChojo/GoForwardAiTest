@@ -6,6 +6,8 @@ using de.chojo.WayFinder.Menu;
 using de.chojo.WayFinder.util;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace de.chojo.WayFinder.Manager {
     public class Field : MonoBehaviour {
@@ -13,9 +15,11 @@ namespace de.chojo.WayFinder.Manager {
 
         private HeatMap _heatMap;
 
+        private bool[,] _blocked;
 
         [Header("Game Setup")] [SerializeField]
         private Vector2Int _dimensions = new Vector2Int(11, 11);
+
 
         [SerializeField] [Range(1, 10)] private float _heatMapRefresh = 5;
         [SerializeField] [Range(1, 250)] private int _aIsPerRound = 10;
@@ -74,7 +78,7 @@ namespace de.chojo.WayFinder.Manager {
 
         private void Start() {
             LoadPlayerPrefs();
-            
+
             _gameControlls = GameControlls.GetInstance();
 
             Brain = new CollectiveBrain();
@@ -89,8 +93,28 @@ namespace de.chojo.WayFinder.Manager {
 
             _heatMap = new GameObject().AddComponent<HeatMap>();
             _heatMap.GenerateHeatMap(_dimensions.x, _dimensions.y, _fieldFrame);
-            
+
             GenerateNewGoal(true, false);
+
+            GenerateObstacles((int) ((_dimensions.x * _dimensions.y) * 0.15f));
+        }
+
+        private void GenerateObstacles(int amount) {
+            var obj = new GameObject {name = "Obstacles"};
+            _blocked = new bool[_dimensions.x, _dimensions.y];
+            for (int i = 0; i < amount; i++) {
+                var field = Instantiate(_fieldFrame);
+                field.name = "Obstacle";
+                field.GetComponent<Renderer>().material.color = Color.black;
+                field.transform.SetParent(obj.transform);
+                Vector3Int pos = new Vector3Int(Random.Range(0, _dimensions.x - 1), Random.Range(0, _dimensions.y), -2);
+                while (pos.x == Goal.x && pos.y == Goal.y) {
+                    pos = new Vector3Int(Random.Range(0, _dimensions.x - 1), Random.Range(0, _dimensions.y), -2);
+                }
+
+                field.transform.position = pos;
+                _blocked[pos.x, pos.y] = true;
+            }
         }
 
 
@@ -157,6 +181,7 @@ namespace de.chojo.WayFinder.Manager {
                 i++) {
                 Instantiate(_aiObject, new Vector3(-1, -1, -1), new Quaternion());
             }
+
             _gameControlls.Log("Start new Round");
         }
 
@@ -211,6 +236,13 @@ namespace de.chojo.WayFinder.Manager {
             _actionsPerSecond = PlayerPrefsHandler.GetAiActionsPerSecond();
         }
 
+        public bool IsBlocked(Vector2Int pos) {
+            if (pos.x > _blocked.GetLength(0) - 1 || pos.y > _blocked.GetLength(1) - 1 || pos.x < 0 || pos.y < 0) {
+                return true;
+            }
+
+            return _blocked[pos.x, pos.y];
+        }
 
         public Vector2Int Dimensions {
             get { return _dimensions; }
