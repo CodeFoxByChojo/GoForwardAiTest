@@ -9,36 +9,57 @@ namespace de.chojo.WayFinder.Manager {
         private GameObject[,] _heatMap;
         private GameControlls _gameControlls;
 
-        private bool _mergeInProgress = false;
+        private HeatMapType _heatMapType;
+
+        private bool _mergeInProgress;
+        private bool _mergeDone = false;
         private QMatrixMemory _mergedMemory;
         private List<QMatrixMemory> _memorysToMerge;
         private int _mergeIndex;
         private int _mergeXIndex;
         private int _mergeYIndex;
-        private int mergesPerFrame;
+        private int _mergePointIndex;
+        private int _mergesPerFrame = 20000;
 
         private bool _drawInProgress = false;
+        private bool _findHighestValue = false;
+        private decimal _highestValue = 0;
         private int _drawXIndex;
         private int _drawYIndex;
-        private int _drawsPerFrame;
+        private int _drawsPerFrame = 100;
+        private int _valueChecksPerFrame;
 
 
         private void Start() {
             _field = Field.GetInstance();
             _gameControlls = GameControlls.GetInstance();
             _mergeIndex = 0;
-            _mergeInProgress = true;
+            _mergeInProgress = false;
         }
 
         private void Update() {
-            if (!_drawInProgress && !_mergeInProgress) {
-                MergeQMatrixDataAsync(true);
-                _mergeInProgress = true;
+            if (!_mergeInProgress && !_mergeDone) {
+                MergeQMatrixDataAsync();
             }
 
-            if (_mergeInProgress) {
-                MergeQMatrixDataAsync(false);
+            if (_mergeInProgress && !_mergeDone) {
+                MergeQMatrixDataAsync();
             }
+
+            if (_mergeDone) {
+                DrawHeatMapAsync();
+            }
+        }
+
+        private void CalculateMergeAmount() {
+            if (_field.AisFoundGoal + _field.AisOnField == 0) {
+                _drawsPerFrame = _mergesPerFrame =
+                    Helper.ClampInt(0, 2, 100);
+                return;
+            }
+
+            _drawsPerFrame = _mergesPerFrame =
+                Helper.ClampInt(200 / (_field.AisFoundGoal + _field.AisOnField), 2, 200);
         }
 
         private void MergeQMatrixDataAsync() {
@@ -127,11 +148,11 @@ namespace de.chojo.WayFinder.Manager {
         /// <summary>
         /// generate the heatmap at start
         /// </summary>
-        public void GenerateHeatMap(int x, int y) {
+        public void GenerateHeatMap(int x, int y, GameObject field) {
             _heatMap = new GameObject[x, y];
             for (var i = 0; i < x; i++) {
                 for (var j = 0; j < y; j++) {
-                    var obj = Instantiate(_field.FieldFrame);
+                    var obj = Instantiate(field);
                     obj.transform.SetParent(gameObject.transform);
                     obj.transform.position = new Vector3(i, j, 1);
                     obj.transform.GetComponent<Renderer>().material.color = new Color(1f, 0.92f, 0.99f);
@@ -140,7 +161,7 @@ namespace de.chojo.WayFinder.Manager {
             }
         }
 
-        private QMatrixMemory MergeQMatrixData(List<Player> PlayerList) {
+        private QMatrixMemory MergeQMatrixDataSync(List<Player> PlayerList) {
             List<QMatrixMemory> temp = new List<QMatrixMemory>();
             foreach (var entry in PlayerList) {
                 temp.Add(entry.CurrentQMatrix);
@@ -154,7 +175,7 @@ namespace de.chojo.WayFinder.Manager {
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    long visits = 0;
+                    decimal visits = 0;
 
                     foreach (var memory in mergedMemory) {
                         up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
@@ -179,25 +200,27 @@ namespace de.chojo.WayFinder.Manager {
         /// <summary>
         /// Redraw the heatmap
         /// </summary>
-        private void DrawHeatMap() {
-            var matrix = MergeQMatrixData(_field.Players);
-            double highestValue = 0;
+        private void DrawHeatMapSync() {
+            var matrix = _mergedMemory;
+            decimal highestValue = 0;
 
             for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
                 for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    double fieldValue = 0;
+                    decimal fieldValue = 0;
 
-                    if (_field.HeatMapType == HeatMapType.BestWay) {
-                        fieldValue = matrix.QMatrix[i, j].GetBestValue();
+                    if (_heatMapType == HeatMapType.BestWay) {
+                        fieldValue = (decimal) matrix.QMatrix[i, j].GetBestValue();
                     }
 
-                    if (_field.HeatMapType == HeatMapType.Visits) {
+                    if (_heatMapType == HeatMapType.Visits) {
                         fieldValue = matrix.QMatrix[i, j].Visits;
                     }
 
                     if (fieldValue > highestValue) highestValue = fieldValue;
                 }
             }
+        }
+
         private void DrawHeatMapAsync() {
             int drawIndex = 0;
 
