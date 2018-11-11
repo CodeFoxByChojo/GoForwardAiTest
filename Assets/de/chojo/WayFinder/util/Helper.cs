@@ -263,7 +263,7 @@ namespace de.chojo.WayFinder.util {
 
             text = text.Replace(",", ".");
             if (float.TryParse(text, out result)) {
-                return (int)result;
+                return (int) result;
             }
 
             return 0;
@@ -281,8 +281,19 @@ namespace de.chojo.WayFinder.util {
             changed = true;
             if (value > max) return max;
             if (value < min) return min;
+            changed = false;
             return value;
+        }
+        public static float ClampFloat(float value, float min, float max) {
+            if (value > max) return max;
+            if (value < min) return min;
+            return value;
+        }
 
+        public static int ClampInt(int value, int min, int max) {
+            if (value > max) return max;
+            if (value < min) return min;
+            return value;
         }
         
     }
