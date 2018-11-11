@@ -265,15 +265,21 @@ namespace de.chojo.WayFinder.util {
         /// </summary>
         /// <param name="text"></param>
         /// <returns>String as int if parse is valid. 0 if not.</returns>
-        public static int StringToInt(string text) {
-            float result;
+        public static int StringToInt(string text, int remove) {
+            int result;
+            text = text.Replace("\u200B", "");
+            int.TryParse(text, out result);
+            return result;
+        }
 
-            text = text.Replace(",", ".");
-            if (float.TryParse(text, out result)) {
-                return (int) result;
+        public static string RemoveEnd(string text, int remove) {
+            string value = "";
+            for (int i = 0; i < text.Length - remove; i++) {
+                value = string.Concat(value, text[i]);
+                Debug.Log(text[i]);
             }
 
-            return 0;
+            return value;
         }
 
         public static float ClampFloat(float value, float min, float max, out bool changed) {
