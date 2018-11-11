@@ -100,7 +100,28 @@ namespace de.chojo.WayFinder.util {
             return result;
         }
 
-        public static Color GetPercentAsColor(double? percent) {
+        public static Color GetPercentAsColor(double value, double maxValue) {
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / (decimal) maxValue);
+        }
+
+        public static Color GetPercentAsColor(double value, decimal maxValue) {
+            if (maxValue == 0 || value == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / maxValue);
+        }
+
+        public static Color GetPercentAsColor(decimal value, double maxValue) {
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / (decimal) maxValue);
+        }
+
+        public static Color GetPercentAsColor(decimal value, decimal maxValue) {
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor(value / maxValue);
+        }
+
+
+        private static Color GetPercentAsColor(Decimal percent) {
             float per;
             if (percent != null) {
                 per = (float) percent;
@@ -149,15 +170,15 @@ namespace de.chojo.WayFinder.util {
             greenToYellow.SetKeys(colorKey3, alphaKey);
             yellowToRed.SetKeys(colorKey4, alphaKey);
 
-            if (percent <= 0.25f) {
+            if ((float) percent <= 0.25f) {
                 return blueToCyan.Evaluate(per);
             }
 
-            if (percent > 0.25f && percent <= 0.50f) {
+            if ((float) percent > 0.25f && (float) percent <= 0.50f) {
                 return cyanToGreen.Evaluate(per);
             }
 
-            if (percent > 0.50f && percent <= 0.75f) {
+            if ((float) percent > 0.50f && (float) percent <= 0.75f) {
                 return greenToYellow.Evaluate(per);
             }
 
