@@ -43,6 +43,20 @@ namespace de.chojo.WayFinder.Manager {
         }
 
         private void Update() {
+            if (_mergeInProgress && Time.deltaTime > 0.016f) {
+                _mergesPerFrame -= 20;
+            }
+            else if (_mergeInProgress && Time.deltaTime < 0.016f) {
+                _mergesPerFrame += 20;
+            }
+
+            if (_mergeDone && Time.deltaTime > 0.016f) {
+                _drawsPerFrame -= 10;
+            }
+            else if (_mergeDone && Time.deltaTime < 0.016f) {
+                _drawsPerFrame += 10;
+            }
+
             if (!_mergeInProgress && !_mergeDone) {
                 MergeQMatrixDataAsync();
             }
