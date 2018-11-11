@@ -15,7 +15,7 @@ namespace de.chojo.WayFinder.util {
         private BigInteger _visits = 0;
 
         public void SetValue(Directions direction, double value) {
-            _visits++;
+            _visits = BigInteger.Add(_visits, BigInteger.One);
             
             if (double.IsNaN(value)) {
                 value = 0;
