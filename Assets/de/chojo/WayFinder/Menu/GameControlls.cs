@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using de.chojo.WayFinder.Manager;
 using de.chojo.WayFinder.util;
 using TMPro;
@@ -16,23 +18,33 @@ namespace de.chojo.WayFinder.Menu {
         [SerializeField] private Slider _aiAmount;
         [SerializeField] private Slider _roundDuration;
         [SerializeField] private Slider _actionsPerSecond;
+        [SerializeField] private TextMeshProUGUI _logText;
 
         [SerializeField] private Button _learningButton;
         private Field _field;
+
+        public List<string> log = new List<string>();
 
         private void Start() {
             _field = Field.GetInstance();
             if (_field.Learning) {
                 ChangeColorOfButton(_learningButton, Color.green);
                 _learningButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Discovering";
-
             }
             else {
                 ChangeColorOfButton(_learningButton, Color.blue);
                 _learningButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Using Way Data";
-
             }
+
             StartCoroutine(LoadSliderValues());
+        }
+
+        private GameControlls() {
+            
+        }
+        
+        public static GameControlls GetInstance() {
+            return FindObjectOfType<GameControlls>();
         }
 
         private IEnumerator LoadSliderValues() {
@@ -50,6 +62,25 @@ namespace de.chojo.WayFinder.Menu {
             _generationDisplay.text = _field.Brain.FindQMatrix(_field.Goal).Generations + ". Generation";
             _aiAmountDisplay.text = "AIs on Field: " + _field.AisOnField;
             _aiAmountInGoalDisplay.text = "AIs in Goal: " + _field.AisFoundGoal;
+            UpdateLog();
+        }
+
+        private void UpdateLog() {
+            string text = "";
+            foreach (var entry in log) {
+                text = string.Concat(text,
+                    "[" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + "] | " +
+                    entry + Environment.NewLine);
+            }
+
+            _logText.text = text;
+        }
+
+        public void Log(string text) {
+            log.Add(text);
+            if (log.Count > 30) {
+                log.RemoveAt(0);
+            }
         }
 
         public void AdjustCamera(Slider slider) {
