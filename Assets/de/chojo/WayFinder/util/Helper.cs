@@ -100,6 +100,27 @@ namespace de.chojo.WayFinder.util {
 
             return result;
         }
+        
+        public static BigInteger GetAverage(List<BigInteger> List) {
+            BigInteger value = 0;
+            BigInteger values = 0;
+            foreach (BigInteger number in List) {
+                if (number > 0) {
+                    value += number;
+                    values++;
+                }
+            }
+
+            BigInteger result;
+            if (value.IsZero || values.IsZero) {
+                return BigInteger.Zero;
+                
+            }
+            result = BigInteger.Divide(value, values);
+
+            return result;
+        }
+
 
         public static Color GetPercentAsColor(double value, double maxValue) {
             if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
