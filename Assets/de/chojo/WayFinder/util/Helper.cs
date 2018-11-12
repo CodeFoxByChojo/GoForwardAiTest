@@ -121,6 +121,20 @@ namespace de.chojo.WayFinder.util {
             return result;
         }
 
+        public static double GetMax(List<double> list) {
+            if(list == null || list.Count == 0)
+                return 0;
+            double value = 0;
+            foreach(var entry in list) {
+                value += entry;
+            }
+
+            if(value == 0) {
+                return 0;
+            }
+            return list.Max();
+        }
+
 
         public static Color GetPercentAsColor(double value, double maxValue) {
             if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
