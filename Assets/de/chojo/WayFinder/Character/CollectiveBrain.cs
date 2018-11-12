@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using de.chojo.WayFinder.util;
+using UnityEditor;
 using UnityEngine;
 
 namespace de.chojo.WayFinder.Character {
@@ -17,8 +19,8 @@ namespace de.chojo.WayFinder.Character {
         /// <param name="goal"></param>
         /// <returns></returns>
         public QMatrixMemory FindQMatrix(Vector2Int goal) {
-            foreach (var matrix in _memory)
-                if (matrix.Equals(goal.x, goal.y))
+            foreach(var matrix in _memory)
+                if(matrix.Equals(goal.x, goal.y))
                     return matrix;
             return new QMatrixMemory(goal);
         }
@@ -28,8 +30,8 @@ namespace de.chojo.WayFinder.Character {
         /// </summary>
         /// <param name="newMatrix"></param>
         private void SafeQMatrix(QMatrixMemory newMatrix) {
-            foreach (var matrix in _memory)
-                if (matrix.Equals(newMatrix.X, newMatrix.Y)) {
+            foreach(var matrix in _memory)
+                if(matrix.Equals(newMatrix.X, newMatrix.Y)) {
                     matrix.QMatrix = newMatrix.QMatrix;
                     return;
                 }
@@ -42,7 +44,7 @@ namespace de.chojo.WayFinder.Character {
         /// </summary>
         /// <param name="qMatrixMemory"></param>
         public void CollectData(QMatrixMemory qMatrixMemory) {
-            if (_collectedMemories == null) _collectedMemories = new List<QMatrixMemory>();
+            if(_collectedMemories == null) _collectedMemories = new List<QMatrixMemory>();
             _collectedMemories.Add(qMatrixMemory);
         }
 
@@ -51,37 +53,40 @@ namespace de.chojo.WayFinder.Character {
         /// Merge the collected data and safe them.
         /// </summary>
         public void MergeAndSaveQMatrixData() {
-            if (_collectedMemories == null) return;
+            if(_collectedMemories == null) return;
             
+
             Debug.Log("Merged " + _collectedMemories.Count + " collected Memories!");
-            
+
             var goal = new Vector2Int(_collectedMemories[0].X, _collectedMemories[0].Y);
+            QMatrixMemory baseMemory = FindQMatrix(goal);
             var data = new QMatrixMemory(goal);
             data.RecordsCountAdd(_collectedMemories[0].Records + CollectedMemories.Count);
             data.Generations = _collectedMemories[0].Generations++;
-            
-            for (var i = 0; i < _collectedMemories[0].QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < _collectedMemories[0].QMatrix.GetLength(1); j++) {
+
+            for(var i = 0; i < _collectedMemories[0].QMatrix.GetLength(0); i++) {
+                for(var j = 0; j < _collectedMemories[0].QMatrix.GetLength(1); j++) {
                     var up = new List<double>();
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    var visits = new List<BigInteger>();
+                    BigInteger visits = BigInteger.Zero;
 
-                    foreach (var player in _collectedMemories) {
+                    foreach(var player in _collectedMemories) {
                         up.Add(player.QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(player.QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(player.QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(player.QMatrix[i, j].GetValue(Directions.Left));
-                        visits.Add(player.QMatrix[i, j].Visits);
+                        visits = BigInteger.Add(visits, (BigInteger.Subtract(player.QMatrix[i, j].Visits, baseMemory.QMatrix[i, j].Visits)));
+                            
                     }
 
 
-                    data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
-                    data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
-                    data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
-                    data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    data.QMatrix[i, j].Visits = Helper.GetAverage(visits);
+                    data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetMax(up));
+                    data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetMax(down));
+                    data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetMax(right));
+                    data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetMax(left));
+                    data.QMatrix[i, j].Visits = BigInteger.Add(visits, data.QMatrix[i,j].Visits);
                 }
             }
 
@@ -90,7 +95,7 @@ namespace de.chojo.WayFinder.Character {
         }
 
         public List<QMatrixMemory> CollectedMemories {
-            get { return _collectedMemories; }
+            get {return _collectedMemories;}
         }
     }
 }
