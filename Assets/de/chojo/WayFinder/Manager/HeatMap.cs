@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using de.chojo.WayFinder.Character;
 using de.chojo.WayFinder.Menu;
@@ -19,6 +20,7 @@ namespace de.chojo.WayFinder.Manager {
         private bool _mergeDone = false;
         private QMatrixMemory _mergedMemory;
         private List<QMatrixMemory> _memorysToMerge;
+        private QMatrixMemory _baseMemory;
         private int _mergeIndex;
         private int _mergeXIndex;
         private int _mergeYIndex;
@@ -38,7 +40,7 @@ namespace de.chojo.WayFinder.Manager {
         List<double> down = new List<double>();
         List<double> right = new List<double>();
         List<double> left = new List<double>();
-        List<BigInteger> visits = new List<BigInteger>();
+        BigInteger visits = BigInteger.Zero;
 
 
         private void Start() {
@@ -108,6 +110,8 @@ namespace de.chojo.WayFinder.Manager {
                         new List<QMatrixMemory>(_field.Brain.CollectedMemories));
                 }
 
+                _baseMemory = _field.Brain.FindQMatrix(_field.Goal);
+
                 _mergeInProgress = true;
                 _gameControlls.Log("Async matrix merge in progress. Trying to merge " + _memorysToMerge.Count +
                                    " records");
@@ -122,7 +126,7 @@ namespace de.chojo.WayFinder.Manager {
                         down.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Left));
-                        visits.Add(_memorysToMerge[k].QMatrix[i, j].Visits);
+                        visits = BigInteger.Add(visits, (BigInteger.Subtract(_memorysToMerge[k].QMatrix[i, j].Visits, _baseMemory.QMatrix[i,j].Visits)));
                         mergeIndex++;
                         if (mergeIndex > _mergesPerFrame) {
                             _mergePointIndex++;
@@ -132,17 +136,19 @@ namespace de.chojo.WayFinder.Manager {
 
                     _mergePointIndex = 0;
 
-                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
-                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
-                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
-                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    _mergedMemory.QMatrix[i, j].Visits = Helper.GetAverage(visits);
+                    
+                    
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Up, Helper.GetMax(up));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetMax(down));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetMax(right));
+                    _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetMax(left));
+                    _mergedMemory.QMatrix[i, j].Visits = BigInteger.Add(visits, _baseMemory.QMatrix[i,j].Visits);
 
                     up = new List<double>();
                     down = new List<double>();
                     right = new List<double>();
                     left = new List<double>();
-                    visits = new List<BigInteger>();
+                    visits = BigInteger.Zero;
 
                     _mergeYIndex = j;
 
