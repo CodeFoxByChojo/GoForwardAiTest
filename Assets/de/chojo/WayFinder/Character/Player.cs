@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using de.chojo.WayFinder.Manager;
 using de.chojo.WayFinder.util;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace de.chojo.WayFinder.Character {
         private Field _field;
         private readonly float _gamma = 0.9f;
 
+        private BigInteger _maxVisitValue;
+        private double _maxWayValue;
+
         private CollectiveBrain brain;
 
         public QMatrixMemory CurrentQMatrix { get; private set; }
@@ -29,7 +33,7 @@ namespace de.chojo.WayFinder.Character {
             SetNewStartPoint();
 
             _actionCounterCounter = 1 / _field.ActionsPerSecond;
-            CurrentQMatrix = brain.FindQMatrix(_field.Goal);
+            CurrentQMatrix = brain.FindQMatrix(_field.Goal, out _maxVisitValue, out _maxWayValue);
 
             if (WayBlocked(Directions.Up) && WayBlocked(Directions.Down) && WayBlocked(Directions.Left) &&
                 WayBlocked(Directions.Right)) {
@@ -90,18 +94,26 @@ namespace de.chojo.WayFinder.Character {
         /// </summary>
         /// <returns></returns>
         private Directions ChooseNextStep() {
-            Directions direction;
+            Directions direction = GetDirectionByCuriosity();
 
+            if (direction != Directions.None) {
+                return direction;
+            }
+
+
+            //Just get a Random Direction
             if (_field.Learning) {
                 direction = (Directions) Random.Range(0, 4);
 
                 while (WayBlocked(direction)) direction = (Directions) Random.Range(0, 4);
             }
+
+            //Find With Curiosity
             else {
                 direction = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
                         _characterPosition.CurrentPos.y]
                     .GetBestDirection();
-                if (direction == Directions.none) {
+                if (direction == Directions.None) {
                     direction = (Directions) Random.Range(0, 4);
 
                     while (WayBlocked(direction)) direction = (Directions) Random.Range(0, 4);
@@ -109,6 +121,78 @@ namespace de.chojo.WayFinder.Character {
             }
 
             return direction;
+        }
+
+        private Directions GetDirectionByCuriosity() {
+            if (_field.Curiosity == 0) {
+                return Directions.None;
+            }
+
+            Point up = CurrentQMatrix.QMatrix[
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up).x,
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up).y];
+            Point down = CurrentQMatrix.QMatrix[
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Down).x,
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Down).y];
+            Point left = CurrentQMatrix.QMatrix[
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Left).x,
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Left).y];
+            Point right = CurrentQMatrix.QMatrix[
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Right).x,
+                Helper.GetNewCoordVector2(
+                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                    Directions.Right).y];
+
+            float upPercent = Helper.GetPercentfromBigInt(up.Visits, _maxVisitValue);
+            float downPercent = Helper.GetPercentfromBigInt(down.Visits, _maxVisitValue);
+            float leftPercent = Helper.GetPercentfromBigInt(left.Visits, _maxVisitValue);
+            float rightPercent = Helper.GetPercentfromBigInt(right.Visits, _maxVisitValue);
+
+            if (!WayBlocked(Directions.Up)) {
+                if (upPercent < downPercent && upPercent < rightPercent && upPercent < leftPercent) {
+                    if (upPercent < (_field.Curiosity / 100)) {
+                        return Directions.Up;
+                    }
+                }
+            }
+
+            if (!WayBlocked(Directions.Up)) {
+                if (downPercent < upPercent && downPercent < rightPercent && downPercent < leftPercent) {
+                    if (upPercent < (_field.Curiosity / 100)) {
+                        return Directions.Down;
+                    }
+                }
+            }
+
+            if (!WayBlocked(Directions.Up)) {
+                if (leftPercent < upPercent && leftPercent < rightPercent && leftPercent < downPercent) {
+                    if (upPercent < (_field.Curiosity / 100)) {
+                        return Directions.Left;
+                    }
+                }
+            }
+
+            if (!WayBlocked(Directions.Up)) {
+                if (rightPercent < upPercent && rightPercent < leftPercent && rightPercent < downPercent) {
+                    if (upPercent < (_field.Curiosity / 100)) {
+                        return Directions.Right;
+                    }
+                }
+            }
+
+            return Directions.None;
         }
 
         /// <summary>
@@ -153,8 +237,15 @@ namespace de.chojo.WayFinder.Character {
                 Debug.Log("Calculation Failed! NaN!");
             }
 
-            CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y]
+            BigInteger visits = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y]
                 .SetValue(direction, value);
+            if (BigInteger.Compare(visits, _maxVisitValue) == 1) {
+                _maxVisitValue = visits;
+            }
+
+            if (value > _maxWayValue) {
+                _maxWayValue = value;
+            }
         }
 
         /// <summary>
