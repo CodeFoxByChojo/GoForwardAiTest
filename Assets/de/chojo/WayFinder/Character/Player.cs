@@ -5,6 +5,7 @@ using de.chojo.WayFinder.Manager;
 using de.chojo.WayFinder.util;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Vector2 = UnityEngine.Vector2;
 
 namespace de.chojo.WayFinder.Character {
     public class Player : MonoBehaviour {
@@ -128,37 +129,64 @@ namespace de.chojo.WayFinder.Character {
                 return Directions.None;
             }
 
-            Point up = CurrentQMatrix.QMatrix[
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up).x,
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up).y];
-            Point down = CurrentQMatrix.QMatrix[
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Down).x,
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Down).y];
-            Point left = CurrentQMatrix.QMatrix[
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Left).x,
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Left).y];
-            Point right = CurrentQMatrix.QMatrix[
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Right).x,
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                    Directions.Right).y];
 
-            float upPercent = Helper.GetPercentfromBigInt(up.Visits, _maxVisitValue);
-            float downPercent = Helper.GetPercentfromBigInt(down.Visits, _maxVisitValue);
-            float leftPercent = Helper.GetPercentfromBigInt(left.Visits, _maxVisitValue);
-            float rightPercent = Helper.GetPercentfromBigInt(right.Visits, _maxVisitValue);
+            //TODO: Out of Bound Exception!
+            Point up = null;
+            Vector2Int upVector = Helper.GetNewCoordVector2(
+                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up);
+            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, upVector.x, upVector.y)) {
+                if (!WayBlocked(Directions.Up))
+                    up = CurrentQMatrix.QMatrix[upVector.x, upVector.y];
+            }
+
+            Point down = null;
+            Vector2Int downVector = Helper.GetNewCoordVector2(
+                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                Directions.Down);
+            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, downVector.x, downVector.y)) {
+                if (!WayBlocked(Directions.Down))
+                    down = CurrentQMatrix.QMatrix[downVector.x, downVector.y];
+            }
+
+            Point left = null;
+            Vector2Int leftVector = Helper.GetNewCoordVector2(
+                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                Directions.Left);
+            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, leftVector.x, leftVector.y)) {
+                if (!WayBlocked(Directions.Left))
+                    left = CurrentQMatrix.QMatrix[leftVector.x, leftVector.y];
+            }
+
+            Point right = null;
+            Vector2Int rightVector = Helper.GetNewCoordVector2(
+                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                Directions.Right);
+            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, rightVector.x, rightVector.y)) {
+                if (!WayBlocked(Directions.Right))
+                    right = CurrentQMatrix.QMatrix[rightVector.x, rightVector.y];
+            }
+
+            float upPercent = 1;
+            float downPercent = 1;
+            float leftPercent = 1;
+            float rightPercent = 1;
+
+            if (up != null) {
+                upPercent = Helper.GetPercentfromBigInt(up.Visits, _maxVisitValue);
+            }
+
+            if (down != null) {
+                downPercent = Helper.GetPercentfromBigInt(down.Visits, _maxVisitValue);
+            }
+
+            if (left != null) {
+                leftPercent = Helper.GetPercentfromBigInt(left.Visits, _maxVisitValue);
+            }
+
+            if (right != null) {
+                rightPercent = Helper.GetPercentfromBigInt(right.Visits, _maxVisitValue);
+            }
+
 
             if (!WayBlocked(Directions.Up)) {
                 if (upPercent < downPercent && upPercent < rightPercent && upPercent < leftPercent) {
@@ -168,25 +196,25 @@ namespace de.chojo.WayFinder.Character {
                 }
             }
 
-            if (!WayBlocked(Directions.Up)) {
+            if (!WayBlocked(Directions.Down)) {
                 if (downPercent < upPercent && downPercent < rightPercent && downPercent < leftPercent) {
-                    if (upPercent < (_field.Curiosity / 100)) {
+                    if (downPercent < (_field.Curiosity / 100)) {
                         return Directions.Down;
                     }
                 }
             }
 
-            if (!WayBlocked(Directions.Up)) {
+            if (!WayBlocked(Directions.Left)) {
                 if (leftPercent < upPercent && leftPercent < rightPercent && leftPercent < downPercent) {
-                    if (upPercent < (_field.Curiosity / 100)) {
+                    if (leftPercent < (_field.Curiosity / 100)) {
                         return Directions.Left;
                     }
                 }
             }
 
-            if (!WayBlocked(Directions.Up)) {
+            if (!WayBlocked(Directions.Right)) {
                 if (rightPercent < upPercent && rightPercent < leftPercent && rightPercent < downPercent) {
-                    if (upPercent < (_field.Curiosity / 100)) {
+                    if (rightPercent < (_field.Curiosity / 100)) {
                         return Directions.Right;
                     }
                 }
