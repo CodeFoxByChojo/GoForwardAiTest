@@ -171,6 +171,21 @@ namespace de.chojo.WayFinder.util {
             return GetPercentAsColor((decimal)(valueAsSmallFloat / maxValueAsSmallFloat));
         }
 
+        public static float GetPercentfromBigInt(BigInteger value, BigInteger maxValue) {
+            if(value.IsZero || maxValue.IsZero) return 0;
+            //Get the GCD
+            var gcd = BigInteger.GreatestCommonDivisor(value, maxValue);
+            //Divide with the gcd to get a small number
+            BigInteger valueBig = BigInteger.Divide(value, gcd);
+            BigInteger maxValueBig = BigInteger.Divide(maxValue, gcd);
+
+            float valueAsSmallFloat = StringToFloat(valueBig.ToString(), 0);
+            float maxValueAsSmallFloat = StringToFloat(maxValueBig.ToString(), 0);
+
+            return valueAsSmallFloat / maxValueAsSmallFloat;
+
+        }
+
 
         private static Color GetPercentAsColor(Decimal percent) {
             float per;
