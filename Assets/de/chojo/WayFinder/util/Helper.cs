@@ -181,32 +181,39 @@ namespace de.chojo.WayFinder.util {
                 per = 0;
             }
 
+            var greyToBlue = new Gradient();
             var blueToCyan = new Gradient();
             var cyanToGreen = new Gradient();
             var greenToYellow = new Gradient();
             var yellowToRed = new Gradient();
 
+            var colorKey0 = new GradientColorKey[2];
+            colorKey0[0].color = Color.grey;
+            colorKey0[0].time = 0.0f;
+            colorKey0[1].color = Color.blue;
+            colorKey0[1].time = 0.001f;
+            
             var colorKey1 = new GradientColorKey[2];
             colorKey1[0].color = Color.blue;
             colorKey1[0].time = 0.0f;
             colorKey1[1].color = Color.cyan;
-            colorKey1[1].time = 0.25f;
+            colorKey1[1].time = 0.001f;
 
             var colorKey2 = new GradientColorKey[2];
             colorKey2[0].color = Color.cyan;
-            colorKey2[0].time = 0.25f;
+            colorKey2[0].time = 0.001f;
             colorKey2[1].color = Color.green;
-            colorKey2[1].time = 0.5f;
+            colorKey2[1].time = 0.33f;
 
             var colorKey3 = new GradientColorKey[2];
             colorKey3[0].color = Color.green;
-            colorKey3[0].time = 0.5f;
+            colorKey3[0].time = 0.33f;
             colorKey3[1].color = Color.yellow;
-            colorKey3[1].time = 0.75f;
+            colorKey3[1].time = 0.66f;
 
             var colorKey4 = new GradientColorKey[2];
             colorKey4[0].color = Color.yellow;
-            colorKey4[0].time = 0.75f;
+            colorKey4[0].time = 0.66f;
             colorKey4[1].color = Color.red;
             colorKey4[1].time = 1f;
 
@@ -216,20 +223,25 @@ namespace de.chojo.WayFinder.util {
             alphaKey[1].alpha = 1f;
             alphaKey[1].time = 1f;
 
+            greyToBlue.SetKeys(colorKey0, alphaKey);
             blueToCyan.SetKeys(colorKey1, alphaKey);
             cyanToGreen.SetKeys(colorKey2, alphaKey);
             greenToYellow.SetKeys(colorKey3, alphaKey);
             yellowToRed.SetKeys(colorKey4, alphaKey);
 
-            if((float)percent <= 0.25f) {
+            if(per <= 0.000001f) {
+                return greyToBlue.Evaluate(per);
+            }
+
+            if ( per > 0.000001f && per <= 0.25f) {
                 return blueToCyan.Evaluate(per);
             }
 
-            if((float)percent > 0.25f && (float)percent <= 0.50f) {
+            if(per > 0.25f && per <= 0.50f) {
                 return cyanToGreen.Evaluate(per);
             }
 
-            if((float)percent > 0.50f && (float)percent <= 0.75f) {
+            if(per > 0.50f && per <= 0.75f) {
                 return greenToYellow.Evaluate(per);
             }
 
@@ -355,7 +367,7 @@ namespace de.chojo.WayFinder.util {
             return value;
         }
 
-        public static Vector2Int GetNewCoordVector2(Vector2Int pos, Directions direction) {
+        public static Vector2Int GetNewCoordVector2(Vector2Int pos, Directions? direction) {
             switch(direction) {
                 case Directions.Up:
                     return new Vector2Int(pos.x, pos.y + 1);
@@ -388,12 +400,7 @@ namespace de.chojo.WayFinder.util {
 }
 
 
-public static class defines {
-    public struct pos {
-        public int x;
-        public int y;
-    }
-}
+
 
 
 public enum Directions {
@@ -401,7 +408,7 @@ public enum Directions {
     Down,
     Right,
     Left,
-    none
+    None
 }
 
 public enum HeatMapType {
