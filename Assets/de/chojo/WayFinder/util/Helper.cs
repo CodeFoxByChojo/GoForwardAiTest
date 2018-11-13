@@ -20,33 +20,33 @@ namespace de.chojo.WayFinder.util {
             var longestNumber = 0;
 
             //Calculate longest Number
-            for(var i = 0; i < array.GetLength(0); i++) {
-                for(var j = 0; j < array.GetLength(1); j++) {
+            for (var i = 0; i < array.GetLength(0); i++) {
+                for (var j = 0; j < array.GetLength(1); j++) {
                     var number = array[i, j].ToString().Length;
-                    if(number > longestNumber) longestNumber = number;
+                    if (number > longestNumber) longestNumber = number;
                 }
             }
 
-            if(array.GetLength(0) > longestNumber) longestNumber = array.GetLength(0);
+            if (array.GetLength(0) > longestNumber) longestNumber = array.GetLength(0);
 
-            if(array.GetLength(1) > longestNumber) longestNumber = array.GetLength(1);
+            if (array.GetLength(1) > longestNumber) longestNumber = array.GetLength(1);
 
-            if(Title.Length > longestNumber) longestNumber = Title.Length;
+            if (Title.Length > longestNumber) longestNumber = Title.Length;
 
             //Write Array
-            for(var i = 0; i < array.GetLength(0) + 1; i++) {
-                for(var j = 0; j < array.GetLength(1) + 1; j++) {
-                    if(i == 0 && j == 0) {
+            for (var i = 0; i < array.GetLength(0) + 1; i++) {
+                for (var j = 0; j < array.GetLength(1) + 1; j++) {
+                    if (i == 0 && j == 0) {
                         serializedArray = AddToStringAndFill(serializedArray, Title, longestNumber);
                         continue;
                     }
 
-                    if(i == 0) {
+                    if (i == 0) {
                         serializedArray = AddToStringAndFill(serializedArray, (j - 1).ToString(), longestNumber);
                         continue;
                     }
 
-                    if(j == 0) {
+                    if (j == 0) {
                         serializedArray = AddToStringAndFill(serializedArray, (i - 1).ToString(), longestNumber);
                         continue;
                     }
@@ -74,7 +74,7 @@ namespace de.chojo.WayFinder.util {
         private static string AddToStringAndFill(string OriginString, string StringToAdd, int FillTo) {
             var fill = FillTo + 1 - StringToAdd.Length;
 
-            for(var k = 0; k < fill; k++) StringToAdd = string.Concat(StringToAdd, " ");
+            for (var k = 0; k < fill; k++) StringToAdd = string.Concat(StringToAdd, " ");
 
             return string.Concat(OriginString, StringToAdd);
         }
@@ -87,15 +87,15 @@ namespace de.chojo.WayFinder.util {
         public static double GetAverage(List<double> List) {
             double value = 0;
             double values = 0;
-            foreach(var number in List) {
-                if(number > 0) {
+            foreach (var number in List) {
+                if (number > 0) {
                     value += number;
                     values++;
                 }
             }
 
             var result = value / values;
-            if(double.IsNaN(result)) {
+            if (double.IsNaN(result)) {
                 result = 0;
             }
 
@@ -105,15 +105,15 @@ namespace de.chojo.WayFinder.util {
         public static BigInteger GetAverage(List<BigInteger> List) {
             BigInteger value = 0;
             BigInteger values = 0;
-            foreach(BigInteger number in List) {
-                if(number > 0) {
+            foreach (BigInteger number in List) {
+                if (number > 0) {
                     value += number;
                     values++;
                 }
             }
 
             BigInteger result;
-            if(value.IsZero || values.IsZero) {
+            if (value.IsZero || values.IsZero) {
                 return BigInteger.Zero;
             }
 
@@ -123,42 +123,43 @@ namespace de.chojo.WayFinder.util {
         }
 
         public static double GetMax(List<double> list) {
-            if(list == null || list.Count == 0)
+            if (list == null || list.Count == 0)
                 return 0;
             double value = 0;
-            foreach(var entry in list) {
+            foreach (var entry in list) {
                 value += entry;
             }
 
-            if(value == 0) {
+            if (value == 0) {
                 return 0;
             }
+
             return list.Max();
         }
 
 
         public static Color GetPercentAsColor(double value, double maxValue) {
-            if(value == 0 || maxValue == 0) return GetPercentAsColor(0);
-            return GetPercentAsColor((decimal)value / (decimal)maxValue);
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / (decimal) maxValue);
         }
 
         public static Color GetPercentAsColor(double value, decimal maxValue) {
-            if(maxValue == 0 || value == 0) return GetPercentAsColor(0);
-            return GetPercentAsColor((decimal)value / maxValue);
+            if (maxValue == 0 || value == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / maxValue);
         }
 
         public static Color GetPercentAsColor(decimal value, double maxValue) {
-            if(value == 0 || maxValue == 0) return GetPercentAsColor(0);
-            return GetPercentAsColor((decimal)value / (decimal)maxValue);
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            return GetPercentAsColor((decimal) value / (decimal) maxValue);
         }
 
         public static Color GetPercentAsColor(decimal value, decimal maxValue) {
-            if(value == 0 || maxValue == 0) return GetPercentAsColor(0);
+            if (value == 0 || maxValue == 0) return GetPercentAsColor(0);
             return GetPercentAsColor(value / maxValue);
         }
 
         public static Color GetPercentAsColor(BigInteger value, BigInteger maxValue) {
-            if(value.IsZero || maxValue.IsZero) return GetPercentAsColor(0);
+            if (value.IsZero || maxValue.IsZero) return GetPercentAsColor(0);
             //Get the GCD
             var gcd = BigInteger.GreatestCommonDivisor(value, maxValue);
             //Divide with the gcd to get a small number
@@ -168,11 +169,11 @@ namespace de.chojo.WayFinder.util {
             float valueAsSmallFloat = StringToFloat(valueBig.ToString(), 0);
             float maxValueAsSmallFloat = StringToFloat(maxValueBig.ToString(), 0);
 
-            return GetPercentAsColor((decimal)(valueAsSmallFloat / maxValueAsSmallFloat));
+            return GetPercentAsColor((decimal) (valueAsSmallFloat / maxValueAsSmallFloat));
         }
 
         public static float GetPercentfromBigInt(BigInteger value, BigInteger maxValue) {
-            if(value.IsZero || maxValue.IsZero) return 0;
+            if (value.IsZero || maxValue.IsZero) return 0;
             //Get the GCD
             var gcd = BigInteger.GreatestCommonDivisor(value, maxValue);
             //Divide with the gcd to get a small number
@@ -183,14 +184,13 @@ namespace de.chojo.WayFinder.util {
             float maxValueAsSmallFloat = StringToFloat(maxValueBig.ToString(), 0);
 
             return valueAsSmallFloat / maxValueAsSmallFloat;
-
         }
 
 
         private static Color GetPercentAsColor(Decimal percent) {
             float per;
-            if(percent != null) {
-                per = (float)percent;
+            if (percent != null) {
+                per = (float) percent;
             }
             else {
                 per = 0;
@@ -207,7 +207,7 @@ namespace de.chojo.WayFinder.util {
             colorKey0[0].time = 0.0f;
             colorKey0[1].color = Color.blue;
             colorKey0[1].time = 0.001f;
-            
+
             var colorKey1 = new GradientColorKey[2];
             colorKey1[0].color = Color.blue;
             colorKey1[0].time = 0.0f;
@@ -244,19 +244,19 @@ namespace de.chojo.WayFinder.util {
             greenToYellow.SetKeys(colorKey3, alphaKey);
             yellowToRed.SetKeys(colorKey4, alphaKey);
 
-            if(per <= 0.000001f) {
+            if (per <= 0.000001f) {
                 return greyToBlue.Evaluate(per);
             }
 
-            if ( per > 0.000001f && per <= 0.25f) {
+            if (per > 0.000001f && per <= 0.25f) {
                 return blueToCyan.Evaluate(per);
             }
 
-            if(per > 0.25f && per <= 0.50f) {
+            if (per > 0.25f && per <= 0.50f) {
                 return cyanToGreen.Evaluate(per);
             }
 
-            if(per > 0.50f && per <= 0.75f) {
+            if (per > 0.50f && per <= 0.75f) {
                 return greenToYellow.Evaluate(per);
             }
 
@@ -265,12 +265,12 @@ namespace de.chojo.WayFinder.util {
 
         public static List<QMatrixMemory> AddListToList(List<QMatrixMemory> firstList, List<QMatrixMemory> secondList) {
             var value = new List<QMatrixMemory>();
-            foreach(var entry in firstList) {
+            foreach (var entry in firstList) {
                 value.Add(entry);
             }
 
-            if(secondList == null) return value;
-            foreach(var entry in secondList) {
+            if (secondList == null) return value;
+            foreach (var entry in secondList) {
                 value.Add(entry);
             }
 
@@ -278,8 +278,8 @@ namespace de.chojo.WayFinder.util {
         }
 
         public static TextMeshProUGUI GetObjectWithTag(TextMeshProUGUI[] texts, string tag) {
-            foreach(var entry in texts) {
-                if(entry.tag.ToLower().Equals(tag.ToLower())) {
+            foreach (var entry in texts) {
+                if (entry.tag.ToLower().Equals(tag.ToLower())) {
                     return entry;
                 }
             }
@@ -288,8 +288,8 @@ namespace de.chojo.WayFinder.util {
         }
 
         public static GameObject GetObjectWithTag(IEnumerable<GameObject> gameObjects, string tag) {
-            foreach(var entry in gameObjects) {
-                if(entry.tag.Equals(tag)) {
+            foreach (var entry in gameObjects) {
+                if (entry.tag.Equals(tag)) {
                     return entry;
                 }
             }
@@ -307,8 +307,8 @@ namespace de.chojo.WayFinder.util {
             float result;
 
             text = text.Replace(",", ".");
-            if(float.TryParse(text, out result)) {
-                result = (float)Math.Round(result, decimalPoints);
+            if (float.TryParse(text, out result)) {
+                result = (float) Math.Round(result, decimalPoints);
                 return result;
             }
 
@@ -324,8 +324,8 @@ namespace de.chojo.WayFinder.util {
             float result;
 
             text = text.Replace(",", ".");
-            if(float.TryParse(text, out result)) {
-                result = (float)Math.Round(result, 2);
+            if (float.TryParse(text, out result)) {
+                result = (float) Math.Round(result, 2);
                 return result;
             }
 
@@ -346,7 +346,7 @@ namespace de.chojo.WayFinder.util {
 
         public static string RemoveEnd(string text, int remove) {
             string value = "";
-            for(int i = 0; i < text.Length - remove; i++) {
+            for (int i = 0; i < text.Length - remove; i++) {
                 value = string.Concat(value, text[i]);
                 Debug.Log(text[i]);
             }
@@ -356,34 +356,34 @@ namespace de.chojo.WayFinder.util {
 
         public static float ClampFloat(float value, float min, float max, out bool changed) {
             changed = true;
-            if(value > max) return max;
-            if(value < min) return min;
+            if (value > max) return max;
+            if (value < min) return min;
             changed = false;
             return value;
         }
 
         public static int ClampInt(int value, int min, int max, out bool changed) {
             changed = true;
-            if(value > max) return max;
-            if(value < min) return min;
+            if (value > max) return max;
+            if (value < min) return min;
             changed = false;
             return value;
         }
 
         public static float ClampFloat(float value, float min, float max) {
-            if(value > max) return max;
-            if(value < min) return min;
+            if (value > max) return max;
+            if (value < min) return min;
             return value;
         }
 
         public static int ClampInt(int value, int min, int max) {
-            if(value > max) return max;
-            if(value < min) return min;
+            if (value > max) return max;
+            if (value < min) return min;
             return value;
         }
 
         public static Vector2Int GetNewCoordVector2(Vector2Int pos, Directions? direction) {
-            switch(direction) {
+            switch (direction) {
                 case Directions.Up:
                     return new Vector2Int(pos.x, pos.y + 1);
                 case Directions.Down:
@@ -398,7 +398,7 @@ namespace de.chojo.WayFinder.util {
         }
 
         public static Vector3Int GetNewCoordVector3(Vector3Int pos, Directions direction) {
-            switch(direction) {
+            switch (direction) {
                 case Directions.Up:
                     return new Vector3Int(pos.x, pos.y + 1, pos.z);
                 case Directions.Down:
@@ -411,11 +411,20 @@ namespace de.chojo.WayFinder.util {
                     throw new ArgumentOutOfRangeException("direction", direction, null);
             }
         }
+
+        public static bool IsIndexOutOfArray(object[] array, int index) {
+            return index > 0 || index < array.Length - 1;
+        }
+
+        public static bool IsIndexOutOfArray(object[,] array, int index0, int index1) {
+            return index0 < 0 || index1 < 0 || index0 > array.GetLength(0) - 1 || index1 > array.GetLength(1) -1;
+        }
+
+        public static bool IsIndexOutOfArray(bool[,] array, int index0, int index1) {
+            return index0 < 0 || index1 < 0 || index0 > array.GetLength(0) - 1 || index1 > array.GetLength(1) -1;
+        }
     }
 }
-
-
-
 
 
 public enum Directions {
@@ -435,6 +444,6 @@ public static class Data {
     private static readonly string _uiUpdateTag = "UiUpdateText";
 
     public static string UiUpdateTag {
-        get {return _uiUpdateTag;}
+        get { return _uiUpdateTag; }
     }
 }
