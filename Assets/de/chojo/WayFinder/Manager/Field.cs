@@ -102,19 +102,43 @@ namespace de.chojo.WayFinder.Manager {
         private void GenerateObstacles(int amount) {
             var obj = new GameObject {name = "Obstacles"};
             _blocked = new bool[_dimensions.x, _dimensions.y];
-            for (int i = 0; i < amount; i++) {
-                var field = Instantiate(_fieldFrame);
-                field.name = "Obstacle";
-                field.GetComponent<Renderer>().material.color = Color.black;
-                field.transform.SetParent(obj.transform);
-                Vector3Int pos = new Vector3Int(Random.Range(0, _dimensions.x - 1), Random.Range(0, _dimensions.y), -2);
-                while (pos.x == Goal.x && pos.y == Goal.y) {
-                    pos = new Vector3Int(Random.Range(0, _dimensions.x - 1), Random.Range(0, _dimensions.y), -2);
+
+            int obstacleValue = (int) (_dimensions.x * _dimensions.y * 0.3f / _obstaclesPerUnit);
+
+            for (int i = 0; i < obstacleValue; i++) {
+                Debug.Log("Generate Obstacle Line");
+                Vector3Int start =
+                    new Vector3Int(Random.Range(1, _dimensions.y - 1), Random.Range(1, _dimensions.y - 1), -2);
+                while (start.x == Goal.x && start.y == Goal.y) {
+                    start = new Vector3Int(Random.Range(1, _dimensions.x - 1), Random.Range(1, _dimensions.y-1), -2);
                 }
 
-                field.transform.position = pos;
-                _blocked[pos.x, pos.y] = true;
+                Vector3Int lastCoord = start;
+
+                Directions dir = (Directions) Random.Range(0, 3);
+
+                GenerateObstacleAt(start, obj);
+
+                for (int j = 0; j < _obstaclesPerUnit; j++) {
+                    Debug.Log("Generate Obstacle");
+
+                    lastCoord = Helper.GetNewCoordVector3(lastCoord, dir);
+                    if (lastCoord.x == Goal.x && lastCoord.y == Goal.y) continue;
+                    if (lastCoord.x > _dimensions.x - 1 || lastCoord.x < 0 || lastCoord.y > _dimensions.y - 1 ||
+                        lastCoord.y < 0) return;
+                    if (_blocked[lastCoord.x, lastCoord.y]) continue;
+                    GenerateObstacleAt(lastCoord, obj);
+                }
             }
+        }
+
+        private void GenerateObstacleAt(Vector3Int pos, GameObject parent) {
+            var field = Instantiate(_fieldFrame);
+            field.name = "Obstacle";
+            field.GetComponent<Renderer>().material.color = Color.black;
+            field.transform.SetParent(parent.transform);
+            field.transform.position = pos;
+            _blocked[pos.x, pos.y] = true;
         }
 
 
@@ -193,8 +217,12 @@ namespace de.chojo.WayFinder.Manager {
                 Goal = _goalInput;
             }
             else if (newGoal) {
-                Goal = new Vector2Int(UnityEngine.Random.Range(1, _dimensions.x - 1),
-                    UnityEngine.Random.Range(1, _dimensions.y - 1));
+                Goal = new Vector2Int(Random.Range(1, _dimensions.x - 1),
+                    Random.Range(1, _dimensions.y - 1));
+                while (_blocked[Goal.x, Goal.y]) {
+                    Goal = new Vector2Int(Random.Range(1, _dimensions.x - 1),
+                        Random.Range(1, _dimensions.y - 1));
+                }
             }
 
             RMatrix = GenerateRMatrix(Goal);
@@ -213,7 +241,7 @@ namespace de.chojo.WayFinder.Manager {
             memory.QMatrix[goal.x + 1, goal.y].SetValue(Directions.Left, 1);
             memory.QMatrix[goal.x, goal.y - 1].SetValue(Directions.Up, 1);
             memory.QMatrix[goal.x, goal.y + 1].SetValue(Directions.Down, 1);
-            memory.QMatrix[goal.x, goal.y].SetValue(Directions.none, 1);
+            memory.QMatrix[goal.x, goal.y].SetValue(Directions.None, 1);
 
             return memory;
         }
@@ -301,6 +329,11 @@ namespace de.chojo.WayFinder.Manager {
 
         public List<Player> Players {
             get { return _players; }
+        }
+
+        public int Curiosity {
+            get { return curiosity; }
+            set { curiosity = value; }
         }
     }
 }
