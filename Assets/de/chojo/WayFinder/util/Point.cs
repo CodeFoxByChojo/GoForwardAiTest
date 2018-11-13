@@ -14,7 +14,7 @@ namespace de.chojo.WayFinder.util {
 
         private BigInteger _visits = 0;
 
-        public void SetValue(Directions direction, double value) {
+        public BigInteger SetValue(Directions direction, double value) {
             _visits = BigInteger.Add(_visits, BigInteger.One);
             
             if (double.IsNaN(value)) {
@@ -34,12 +34,14 @@ namespace de.chojo.WayFinder.util {
                 case Directions.Left:
                     _left = value;
                     break;
-                case Directions.none:
+                case Directions.None:
                     _none = value;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("direction", direction, null);
             }
+
+            return _visits;
         }
 
         public double GetValue(Directions direction) {
@@ -66,7 +68,7 @@ namespace de.chojo.WayFinder.util {
                 return Directions.Left;
             if (_right > _up && _right > _down && _right > _left)
                 return Directions.Right;
-            return Directions.none;
+            return Directions.None;
         }
 
         public double GetValueSum() {

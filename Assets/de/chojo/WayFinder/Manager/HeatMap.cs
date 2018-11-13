@@ -126,7 +126,9 @@ namespace de.chojo.WayFinder.Manager {
                         down.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Left));
-                        visits = BigInteger.Add(visits, (BigInteger.Subtract(_memorysToMerge[k].QMatrix[i, j].Visits, _baseMemory.QMatrix[i,j].Visits)));
+                        visits = BigInteger.Add(visits,
+                            (BigInteger.Subtract(_memorysToMerge[k].QMatrix[i, j].Visits,
+                                _baseMemory.QMatrix[i, j].Visits)));
                         mergeIndex++;
                         if (mergeIndex > _mergesPerFrame) {
                             _mergePointIndex++;
@@ -136,13 +138,12 @@ namespace de.chojo.WayFinder.Manager {
 
                     _mergePointIndex = 0;
 
-                    
-                    
+
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Up, Helper.GetMax(up));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetMax(down));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetMax(right));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetMax(left));
-                    _mergedMemory.QMatrix[i, j].Visits = BigInteger.Add(visits, _baseMemory.QMatrix[i,j].Visits);
+                    _mergedMemory.QMatrix[i, j].Visits = BigInteger.Add(visits, _baseMemory.QMatrix[i, j].Visits);
 
                     up = new List<double>();
                     down = new List<double>();

@@ -17,6 +17,9 @@ namespace de.chojo.WayFinder.Manager {
 
         private bool[,] _blocked;
 
+        private int _obstaclesPerUnit = 5;
+
+
         [Header("Game Setup")] [SerializeField]
         private Vector2Int _dimensions = new Vector2Int(11, 11);
 
@@ -52,6 +55,8 @@ namespace de.chojo.WayFinder.Manager {
         [SerializeField] private GameObject _fieldFrame;
 
         private GameControlls _gameControlls;
+
+        private int curiosity = 0;
 
         public static Field GetInstance() {
             return FindObjectOfType<Field>();
