@@ -270,7 +270,7 @@ namespace de.chojo.WayFinder.Manager {
         }
 
         public bool IsBlocked(Vector2Int pos) {
-            if (pos.x > _blocked.GetLength(0) - 1 || pos.y > _blocked.GetLength(1) - 1 || pos.x < 0 || pos.y < 0) {
+            if (Helper.IsIndexOutOfArray(_blocked, pos.x, pos.y)) {
                 return true;
             }
 
