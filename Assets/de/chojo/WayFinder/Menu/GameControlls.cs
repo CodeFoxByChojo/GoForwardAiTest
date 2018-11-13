@@ -18,6 +18,7 @@ namespace de.chojo.WayFinder.Menu {
         [SerializeField] private Slider _aiAmount;
         [SerializeField] private Slider _roundDuration;
         [SerializeField] private Slider _actionsPerSecond;
+        [SerializeField] private Slider _curiosity;
         [SerializeField] private TextMeshProUGUI _logText;
 
         [SerializeField] private Button _learningButton;
@@ -54,6 +55,7 @@ namespace de.chojo.WayFinder.Menu {
             GetIntAndSetTextForSliderWithTag(_roundDuration, Data.UiUpdateTag);
             _actionsPerSecond.value = _field.ActionsPerSecond;
             GetIntAndSetTextForSliderWithTag(_actionsPerSecond, Data.UiUpdateTag);
+            GetIntAndSetTextForSliderWithTag(_curiosity, Data.UiUpdateTag);
         }
 
         private void Update() {
@@ -147,6 +149,10 @@ namespace de.chojo.WayFinder.Menu {
 
         public void GenerateNewGoal() {
             _field.GenerateNewGoal(false, true);
+        }
+
+        public void CuriosityChanged(Slider slider) {
+            _field.Curiosity = GetIntAndSetTextForSliderWithTag(slider, tag);
         }
     }
 }
