@@ -40,7 +40,7 @@ namespace de.chojo.WayFinder.Manager {
         List<double> down = new List<double>();
         List<double> right = new List<double>();
         List<double> left = new List<double>();
-        BigInteger visits = BigInteger.Zero;
+        Visit visits = new Visit();
 
 
         private void Start() {
@@ -51,35 +51,35 @@ namespace de.chojo.WayFinder.Manager {
         }
 
         private void Update() {
-            if (_mergeInProgress && Time.deltaTime > 0.016f) {
+            if(_mergeInProgress && Time.deltaTime > 0.016f) {
                 _mergesPerFrame -= 20;
             }
-            else if (_mergeInProgress && Time.deltaTime < 0.016f) {
+            else if(_mergeInProgress && Time.deltaTime < 0.016f) {
                 _mergesPerFrame += 20;
             }
 
-            if (_mergeDone && Time.deltaTime > 0.016f) {
+            if(_mergeDone && Time.deltaTime > 0.016f) {
                 _drawsPerFrame -= 10;
             }
-            else if (_mergeDone && Time.deltaTime < 0.016f) {
+            else if(_mergeDone && Time.deltaTime < 0.016f) {
                 _drawsPerFrame += 10;
             }
 
-            if (!_mergeInProgress && !_mergeDone) {
+            if(!_mergeInProgress && !_mergeDone) {
                 MergeQMatrixDataAsync();
             }
 
-            if (_mergeInProgress && !_mergeDone) {
+            if(_mergeInProgress && !_mergeDone) {
                 MergeQMatrixDataAsync();
             }
 
-            if (_mergeDone) {
+            if(_mergeDone) {
                 DrawHeatMapAsync();
             }
         }
 
         private void CalculateMergeAmount() {
-            if (_field.AisFoundGoal + _field.AisOnField == 0) {
+            if(_field.AisFoundGoal + _field.AisOnField == 0) {
                 _drawsPerFrame = _mergesPerFrame =
                     Helper.ClampInt(0, 2, 100);
                 return;
@@ -90,24 +90,24 @@ namespace de.chojo.WayFinder.Manager {
         }
 
         private void MergeQMatrixDataAsync() {
-            if (!_mergeInProgress) {
+            if(!_mergeInProgress) {
                 List<QMatrixMemory> tempPlayer = new List<QMatrixMemory>();
                 _mergedMemory = new QMatrixMemory(_field.Goal);
 
                 _heatMapType = _field.HeatMapType;
 
-                if (_field.Players == null) return;
+                if(_field.Players == null) return;
 
-                foreach (var entry in _field.Players) {
+                foreach(var entry in _field.Players) {
                     tempPlayer.Add(entry.CurrentQMatrix);
                 }
 
-                if (_field.Brain.CollectedMemories == null) {
+                if(_field.Brain.CollectedMemories == null) {
                     _memorysToMerge = new List<QMatrixMemory>(tempPlayer);
                 }
                 else {
                     _memorysToMerge = Helper.AddListToList(tempPlayer,
-                        new List<QMatrixMemory>(_field.Brain.CollectedMemories));
+                                                           new List<QMatrixMemory>(_field.Brain.CollectedMemories));
                 }
 
                 _baseMemory = _field.Brain.FindQMatrix(_field.Goal);
@@ -119,18 +119,19 @@ namespace de.chojo.WayFinder.Manager {
             }
 
             int mergeIndex = 0;
-            for (var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
-                for (var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
-                    for (int k = _mergePointIndex; k < _memorysToMerge.Count; k++) {
+            for(var i = _mergeXIndex; i < _field.Dimensions.x; i++) {
+                for(var j = _mergeYIndex; j < _field.Dimensions.y; j++) {
+                    for(int k = _mergePointIndex; k < _memorysToMerge.Count; k++) {
                         up.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(_memorysToMerge[k].QMatrix[i, j].GetValue(Directions.Left));
-                        visits = BigInteger.Add(visits,
-                            (BigInteger.Subtract(_memorysToMerge[k].QMatrix[i, j].Visits,
-                                _baseMemory.QMatrix[i, j].Visits)));
+                        visits.Up += _memorysToMerge[k].QMatrix[i, j].Visits.Up - _baseMemory.QMatrix[i, j].Visits.Up;
+                        visits.Down += _memorysToMerge[k].QMatrix[i, j].Visits.Down - _baseMemory.QMatrix[i, j].Visits.Down;
+                        visits.Left += _memorysToMerge[k].QMatrix[i, j].Visits.Left - _baseMemory.QMatrix[i, j].Visits.Left;
+                        visits.Right += _memorysToMerge[k].QMatrix[i, j].Visits.Right - _baseMemory.QMatrix[i, j].Visits.Up;
                         mergeIndex++;
-                        if (mergeIndex > _mergesPerFrame) {
+                        if(mergeIndex > _mergesPerFrame) {
                             _mergePointIndex++;
                             return;
                         }
@@ -143,19 +144,23 @@ namespace de.chojo.WayFinder.Manager {
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Down, Helper.GetMax(down));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Right, Helper.GetMax(right));
                     _mergedMemory.QMatrix[i, j].SetValue(Directions.Left, Helper.GetMax(left));
-                    _mergedMemory.QMatrix[i, j].Visits = BigInteger.Add(visits, _baseMemory.QMatrix[i, j].Visits);
+
+                    _mergedMemory.QMatrix[i, j].Visits.Up += _baseMemory.QMatrix[i, j].Visits.Up;
+                    _mergedMemory.QMatrix[i, j].Visits.Down += _baseMemory.QMatrix[i, j].Visits.Down;
+                    _mergedMemory.QMatrix[i, j].Visits.Left += _baseMemory.QMatrix[i, j].Visits.Left;
+                    _mergedMemory.QMatrix[i, j].Visits.Right += _baseMemory.QMatrix[i, j].Visits.Right;
 
                     up = new List<double>();
                     down = new List<double>();
                     right = new List<double>();
                     left = new List<double>();
-                    visits = BigInteger.Zero;
+                    visits = new Visit();
 
                     _mergeYIndex = j;
 
                     mergeIndex++;
-                    if (mergeIndex > _mergesPerFrame) {
-                        if (j + 1 >= _field.Dimensions.y) {
+                    if(mergeIndex > _mergesPerFrame) {
+                        if(j + 1 >= _field.Dimensions.y) {
                             _mergeXIndex++;
                             _mergeYIndex = 0;
                             return;
@@ -182,8 +187,8 @@ namespace de.chojo.WayFinder.Manager {
         /// </summary>
         public void GenerateHeatMap(int x, int y, GameObject field) {
             _heatMap = new GameObject[x, y];
-            for (var i = 0; i < x; i++) {
-                for (var j = 0; j < y; j++) {
+            for(var i = 0; i < x; i++) {
+                for(var j = 0; j < y; j++) {
                     var obj = Instantiate(field);
                     obj.transform.SetParent(gameObject.transform);
                     obj.transform.position = new Vector3(i, j, 1);
@@ -195,33 +200,33 @@ namespace de.chojo.WayFinder.Manager {
 
         private QMatrixMemory MergeQMatrixDataSync(List<Player> PlayerList) {
             List<QMatrixMemory> temp = new List<QMatrixMemory>();
-            foreach (var entry in PlayerList) {
+            foreach(var entry in PlayerList) {
                 temp.Add(entry.CurrentQMatrix);
             }
 
             var mergedMemory = Helper.AddListToList(temp, _field.Brain.CollectedMemories);
             var data = new QMatrixMemory(_field.Goal);
-            for (var i = 0; i < _field.Dimensions.x; i++) {
-                for (var j = 0; j < _field.Dimensions.y; j++) {
+            for(var i = 0; i < _field.Dimensions.x; i++) {
+                for(var j = 0; j < _field.Dimensions.y; j++) {
                     var up = new List<double>();
                     var down = new List<double>();
                     var right = new List<double>();
                     var left = new List<double>();
-                    var visits = new List<BigInteger>();
+                    var visits = new Visits();
 
-                    foreach (var memory in mergedMemory) {
+                    foreach(var memory in mergedMemory) {
                         up.Add(memory.QMatrix[i, j].GetValue(Directions.Up));
                         down.Add(memory.QMatrix[i, j].GetValue(Directions.Down));
                         right.Add(memory.QMatrix[i, j].GetValue(Directions.Right));
                         left.Add(memory.QMatrix[i, j].GetValue(Directions.Left));
-                        visits.Add(memory.QMatrix[i, j].Visits);
+                        //TODO: Visit Merge
                     }
 
                     data.QMatrix[i, j].SetValue(Directions.Up, Helper.GetAverage(up));
                     data.QMatrix[i, j].SetValue(Directions.Down, Helper.GetAverage(down));
                     data.QMatrix[i, j].SetValue(Directions.Right, Helper.GetAverage(right));
                     data.QMatrix[i, j].SetValue(Directions.Left, Helper.GetAverage(left));
-                    data.QMatrix[i, j].Visits = Helper.GetAverage(visits);
+                    //TODO: Visit write
                 }
             }
 
@@ -237,16 +242,16 @@ namespace de.chojo.WayFinder.Manager {
             BigInteger highestVisitValue = 0;
             double highestWayValue = 0;
 
-            for (var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
-                for (var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
-                    if (_heatMapType == HeatMapType.BestWay) {
+            for(var i = 0; i < matrix.QMatrix.GetLength(0); i++) {
+                for(var j = 0; j < matrix.QMatrix.GetLength(1); j++) {
+                    if(_heatMapType == HeatMapType.BestWay) {
                         var wayValue = matrix.QMatrix[i, j].GetBestValue();
-                        if (wayValue > highestWayValue) highestWayValue = wayValue;
+                        if(wayValue > highestWayValue) highestWayValue = wayValue;
                     }
 
-                    if (_heatMapType == HeatMapType.Visits) {
-                        var visitValue = matrix.QMatrix[i, j].Visits;
-                        if (visitValue > highestVisitValue) highestVisitValue = visitValue;
+                    if(_heatMapType == HeatMapType.Visits) {
+                        var visitValue = matrix.QMatrix[i, j].Visits.GetValueSum();
+                        if(visitValue > highestVisitValue) highestVisitValue = visitValue;
                     }
                 }
             }
@@ -255,24 +260,24 @@ namespace de.chojo.WayFinder.Manager {
         private void DrawHeatMapAsync() {
             int drawIndex = 0;
 
-            if (!_findHighestValue) {
-                for (var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
-                    for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
-                        if (_heatMapType == HeatMapType.BestWay) {
+            if(!_findHighestValue) {
+                for(var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
+                    for(var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
+                        if(_heatMapType == HeatMapType.BestWay) {
                             var wayValue = _mergedMemory.QMatrix[i, j].GetBestValue();
-                            if (wayValue > _highestWayValue) _highestWayValue = wayValue;
+                            if(wayValue > _highestWayValue) _highestWayValue = wayValue;
                         }
 
-                        if (_heatMapType == HeatMapType.Visits) {
-                            var visitValue = _mergedMemory.QMatrix[i, j].Visits;
-                            if (visitValue > _highestVisitValue) _highestVisitValue = visitValue;
+                        if(_heatMapType == HeatMapType.Visits) {
+                            var visitValue = _mergedMemory.QMatrix[i, j].Visits.GetValueSum();
+                            if(visitValue > _highestVisitValue) _highestVisitValue = visitValue;
                         }
 
 
                         _drawYIndex = j;
                         drawIndex++;
-                        if (drawIndex > _mergesPerFrame) {
-                            if (j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
+                        if(drawIndex > _mergesPerFrame) {
+                            if(j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
                                 _drawXIndex++;
                                 _drawYIndex = 0;
                                 return;
@@ -296,22 +301,22 @@ namespace de.chojo.WayFinder.Manager {
             }
 
 
-            for (var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
-                for (var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
-                    if (_heatMapType == HeatMapType.BestWay) {
+            for(var i = _drawXIndex; i < _mergedMemory.QMatrix.GetLength(0); i++) {
+                for(var j = _drawYIndex; j < _mergedMemory.QMatrix.GetLength(1); j++) {
+                    if(_heatMapType == HeatMapType.BestWay) {
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
                             Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].GetBestValue(), _highestWayValue);
                     }
 
-                    if (_heatMapType == HeatMapType.Visits) {
+                    if(_heatMapType == HeatMapType.Visits) {
                         _heatMap[i, j].GetComponent<Renderer>().material.color =
-                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].Visits, _highestVisitValue);
+                            Helper.GetPercentAsColor(_mergedMemory.QMatrix[i, j].Visits.GetValueSum(), _highestVisitValue);
                     }
 
                     _drawYIndex = j;
                     drawIndex++;
-                    if (drawIndex > _drawsPerFrame) {
-                        if (j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
+                    if(drawIndex > _drawsPerFrame) {
+                        if(j + 1 >= _mergedMemory.QMatrix.GetLength(1)) {
                             _drawXIndex++;
                             _drawYIndex = 0;
                             return;
