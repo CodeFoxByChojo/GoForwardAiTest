@@ -412,6 +412,37 @@ namespace de.chojo.WayFinder.util {
             }
         }
 
+
+        public static bool IsLargestNumber(double number, params double[] numbers) {
+            foreach(var entry in numbers) {
+                if(entry >= number) return false;
+            }
+            return true;
+        }
+        
+        public static bool IsLargestNumber(int number, params int[] numbers) {
+            foreach(var entry in numbers) {
+                if(entry >= number) return false;
+            }
+            return true;
+        }
+
+        public static bool IsSmallestNumber(double number, params double[] numbers) {
+            foreach(var entry in numbers) {
+                if(entry <= number) return false;
+            }
+
+            return true;
+        }
+        
+        public static bool IsSmallestNumber(int number, params int[] numbers) {
+            foreach(var entry in numbers) {
+                if(entry <= number) return false;
+            }
+
+            return true;
+        }
+
         public static bool IsIndexOutOfArray(object[] array, int index) {
             return index > 0 || index < array.Length - 1;
         }
