@@ -125,44 +125,46 @@ namespace de.chojo.WayFinder.Character {
         }
 
         private Directions GetDirectionByCuriosity() {
-            if (_field.Curiosity == 0) {
+            bool _fieldHasValue = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y].GetBestValue() > 0;
+
+            if(_field.Curiosity == 0) {
                 return Directions.None;
             }
 
+            Point current = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y];
 
-            //TODO: Out of Bound Exception!
             Point up = null;
             Vector2Int upVector = Helper.GetNewCoordVector2(
-                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up);
-            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, upVector.x, upVector.y)) {
-                if (!WayBlocked(Directions.Up))
+                                                            new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up);
+            if(!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, upVector.x, upVector.y)) {
+                if(!WayBlocked(Directions.Up))
                     up = CurrentQMatrix.QMatrix[upVector.x, upVector.y];
             }
 
             Point down = null;
             Vector2Int downVector = Helper.GetNewCoordVector2(
-                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                Directions.Down);
-            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, downVector.x, downVector.y)) {
-                if (!WayBlocked(Directions.Down))
+                                                              new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                                                              Directions.Down);
+            if(!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, downVector.x, downVector.y)) {
+                if(!WayBlocked(Directions.Down))
                     down = CurrentQMatrix.QMatrix[downVector.x, downVector.y];
             }
 
             Point left = null;
             Vector2Int leftVector = Helper.GetNewCoordVector2(
-                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                Directions.Left);
-            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, leftVector.x, leftVector.y)) {
-                if (!WayBlocked(Directions.Left))
+                                                              new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                                                              Directions.Left);
+            if(!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, leftVector.x, leftVector.y)) {
+                if(!WayBlocked(Directions.Left))
                     left = CurrentQMatrix.QMatrix[leftVector.x, leftVector.y];
             }
 
             Point right = null;
             Vector2Int rightVector = Helper.GetNewCoordVector2(
-                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
-                Directions.Right);
-            if (!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, rightVector.x, rightVector.y)) {
-                if (!WayBlocked(Directions.Right))
+                                                               new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
+                                                               Directions.Right);
+            if(!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, rightVector.x, rightVector.y)) {
+                if(!WayBlocked(Directions.Right))
                     right = CurrentQMatrix.QMatrix[rightVector.x, rightVector.y];
             }
 
@@ -171,54 +173,123 @@ namespace de.chojo.WayFinder.Character {
             float leftPercent = 1;
             float rightPercent = 1;
 
-            if (up != null) {
-                upPercent = Helper.GetPercentfromBigInt(up.Visits, _maxVisitValue);
+            if(up != null) {
+                upPercent = up.Visits.Up / _maxVisitValue;
             }
 
-            if (down != null) {
-                downPercent = Helper.GetPercentfromBigInt(down.Visits, _maxVisitValue);
+            if(down != null) {
+                downPercent = down.Visits.Down / _maxVisitValue;
             }
 
-            if (left != null) {
-                leftPercent = Helper.GetPercentfromBigInt(left.Visits, _maxVisitValue);
+            if(left != null) {
+                leftPercent = left.Visits.Left / _maxVisitValue;
             }
 
-            if (right != null) {
-                rightPercent = Helper.GetPercentfromBigInt(right.Visits, _maxVisitValue);
+            if(right != null) {
+                rightPercent = right.Visits.Right / _maxVisitValue;
             }
 
+            if(_fieldHasValue) {
+                //go to field with lowest value.
+                if(up != null)
+                    if(!WayBlocked(Directions.Up))
+                        if(Math.Abs(up.GetBestValue()) < 0.00001)
+                            return Directions.Up;
 
-            if (!WayBlocked(Directions.Up)) {
-                if (upPercent < downPercent && upPercent < rightPercent && upPercent < leftPercent) {
-                    if (upPercent < (_field.Curiosity / 100)) {
-                        return Directions.Up;
-                    }
+                if(down != null)
+                    if(!WayBlocked(Directions.Down))
+                        if(Math.Abs(down.GetBestValue()) < 0.00001)
+                            return Directions.Down;
+
+                if(left != null)
+                    if(!WayBlocked(Directions.Left))
+                        if(Math.Abs(left.GetBestValue()) < 0.00001)
+                            return Directions.Left;
+
+                if(right != null)
+                    if(!WayBlocked(Directions.Right))
+                        if(Math.Abs(right.GetBestValue()) < 0.00001)
+                            return Directions.Right;
+
+                //Go to field with lowest visit rate.
+                int visits;
+                Directions dir = current.Visits.GetDirectionWithLowestVistis(out visits);
+                if(visits / _maxVisitValue < (_field.Curiosity / 100) * _maxVisitValue)
+                    if(dir != Directions.None)
+                        return dir;
+            }
+
+            if(!_fieldHasValue) {
+                if(Random.Range(1, 100) <= _field.Curiosity) {
+                    //TODO: Go to field with highest Value. If not found return random.
+                    double upValue = 0;
+                    double downValue = 0;
+                    double leftValue = 0;
+                    double rightValue = 0;
+
+                    if(up != null)
+                        upValue = up.GetBestValue();
+                    if(down != null)
+                        downValue = down.GetBestValue();
+                    if(left != null)
+                        leftValue = left.GetBestValue();
+                    if(right != null)
+                        rightValue = right.GetBestValue();
+
+                    if(!WayBlocked(Directions.Up))
+                        if(upValue != 0)
+                            if(Helper.IsLargestNumber(upValue, downValue, leftValue, rightValue))
+                                return Directions.Up;
+
+                    if(!WayBlocked(Directions.Down))
+                        if(downValue != 0)
+                            if(Helper.IsLargestNumber(downValue, upValue, leftValue, rightValue))
+                                return Directions.Down;
+
+                    if(!WayBlocked(Directions.Left))
+                        if(leftValue != 0)
+                            if(Helper.IsLargestNumber(leftValue, rightValue, downValue, downPercent, upValue))
+                                return Directions.Left;
+
+                    if(!WayBlocked(Directions.Right))
+                        if(rightValue != 0)
+                            if(Helper.IsLargestNumber(rightValue, leftValue, upValue, downValue))
+                                return Directions.Right;
                 }
             }
 
-            if (!WayBlocked(Directions.Down)) {
-                if (downPercent < upPercent && downPercent < rightPercent && downPercent < leftPercent) {
-                    if (downPercent < (_field.Curiosity / 100)) {
-                        return Directions.Down;
-                    }
-                }
-            }
 
-            if (!WayBlocked(Directions.Left)) {
-                if (leftPercent < upPercent && leftPercent < rightPercent && leftPercent < downPercent) {
-                    if (leftPercent < (_field.Curiosity / 100)) {
-                        return Directions.Left;
-                    }
-                }
-            }
-
-            if (!WayBlocked(Directions.Right)) {
-                if (rightPercent < upPercent && rightPercent < leftPercent && rightPercent < downPercent) {
-                    if (rightPercent < (_field.Curiosity / 100)) {
-                        return Directions.Right;
-                    }
-                }
-            }
+//            if(!WayBlocked(Directions.Up)) {
+//                if(Helper.IsSmallestNumber(upPercent, downPercent, rightPercent, leftPercent)) {
+//                    if(upPercent < (_field.Curiosity / 100)) {
+//                        return Directions.Up;
+//                    }
+//                }
+//            }
+//
+//            if(!WayBlocked(Directions.Down)) {
+//                if(Helper.IsSmallestNumber(downPercent, upPercent, rightPercent, leftPercent)) {
+//                    if(downPercent < (_field.Curiosity / 100)) {
+//                        return Directions.Down;
+//                    }
+//                }
+//            }
+//
+//            if(!WayBlocked(Directions.Left)) {
+//                if(Helper.IsSmallestNumber(leftPercent, upPercent, rightPercent, downPercent)) {
+//                    if(leftPercent < (_field.Curiosity / 100)) {
+//                        return Directions.Left;
+//                    }
+//                }
+//            }
+//
+//            if(!WayBlocked(Directions.Right)) {
+//                if(Helper.IsSmallestNumber(rightPercent, upPercent, leftPercent, downPercent)) {
+//                    if(rightPercent < (_field.Curiosity / 100)) {
+//                        return Directions.Right;
+//                    }
+//                }
+//            }
 
             return Directions.None;
         }
