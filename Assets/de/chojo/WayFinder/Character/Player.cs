@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.Remoting.Messaging;
 using de.chojo.WayFinder.Manager;
 using de.chojo.WayFinder.util;
 using UnityEditor;
@@ -169,47 +170,47 @@ namespace de.chojo.WayFinder.Character {
                     right = CurrentQMatrix.QMatrix[rightVector.x, rightVector.y];
             }
 
-            float upPercent = 1;
-            float downPercent = 1;
-            float leftPercent = 1;
-            float rightPercent = 1;
+            double upPercent = 1;
+            double downPercent = 1;
+            double leftPercent = 1;
+            double rightPercent = 1;
 
             if(up != null) {
-                upPercent = up.Visits.Up / _maxVisitValue;
+                upPercent = Helper.SaveDivide(up.Visits.Up, _maxVisitValue);
             }
 
             if(down != null) {
-                downPercent = down.Visits.Down / _maxVisitValue;
+                downPercent = Helper.SaveDivide(down.Visits.Down, _maxVisitValue);
             }
 
             if(left != null) {
-                leftPercent = left.Visits.Left / _maxVisitValue;
+                leftPercent = Helper.SaveDivide(left.Visits.Left, _maxVisitValue);
             }
 
             if(right != null) {
-                rightPercent = right.Visits.Right / _maxVisitValue;
+                rightPercent = Helper.SaveDivide(right.Visits.Right, _maxVisitValue);
             }
 
             if(_fieldHasValue) {
                 //go to field with lowest value.
                 if(up != null)
                     if(!WayBlocked(Directions.Up))
-                        if(Math.Abs(up.GetBestValue()) < 0.00001)
+                        if(Math.Abs(up.GetBestValue()) < 0.0000000000001)
                             return Directions.Up;
 
                 if(down != null)
                     if(!WayBlocked(Directions.Down))
-                        if(Math.Abs(down.GetBestValue()) < 0.00001)
+                        if(Math.Abs(down.GetBestValue()) < 0.0000000000001)
                             return Directions.Down;
 
                 if(left != null)
                     if(!WayBlocked(Directions.Left))
-                        if(Math.Abs(left.GetBestValue()) < 0.00001)
+                        if(Math.Abs(left.GetBestValue()) < 0.0000000000001)
                             return Directions.Left;
 
                 if(right != null)
                     if(!WayBlocked(Directions.Right))
-                        if(Math.Abs(right.GetBestValue()) < 0.00001)
+                        if(Math.Abs(right.GetBestValue()) < 0.0000000000001)
                             return Directions.Right;
 
                 //Go to field with lowest visit rate.
@@ -249,7 +250,7 @@ namespace de.chojo.WayFinder.Character {
 
                     if(!WayBlocked(Directions.Left))
                         if(leftValue != 0)
-                            if(Helper.IsLargestNumber(leftValue, rightValue, downValue, downPercent, upValue))
+                            if(Helper.IsLargestNumber(leftValue, rightValue, downValue, upValue))
                                 return Directions.Left;
 
                     if(!WayBlocked(Directions.Right))
@@ -392,20 +393,24 @@ namespace de.chojo.WayFinder.Character {
             switch(direction) {
                 case Directions.Up:
                     //if(_characterPosition.CurrentPos.y + 1 > _field.Dimensions.y) break;
-                    tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                                                       _characterPosition.CurrentPos.y + 1];
+                    var posUp = new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y + 1);
+                    if(Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, posUp.x, posUp.y)) return 0;
+                    tempPoint = CurrentQMatrix.QMatrix[posUp.x, posUp.y];
                     break;
                 case Directions.Down:
-                    tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                                                       _characterPosition.CurrentPos.y - 1];
+                    var posDown = new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y - 1);
+                    if(Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, posDown.x, posDown.y)) return 0;
+                    tempPoint = CurrentQMatrix.QMatrix[posDown.x, posDown.y];
                     break;
                 case Directions.Right:
-                    tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x + 1,
-                                                       _characterPosition.CurrentPos.y];
+                    var posRight = new Vector2Int(_characterPosition.CurrentPos.x + 1, _characterPosition.CurrentPos.y);
+                    if(Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, posRight.x, posRight.y)) return 0;
+                    tempPoint = CurrentQMatrix.QMatrix[posRight.x, posRight.y];
                     break;
                 case Directions.Left:
-                    tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x - 1,
-                                                       _characterPosition.CurrentPos.y];
+                    var posLeft = new Vector2Int(_characterPosition.CurrentPos.x - 1, _characterPosition.CurrentPos.y);
+                    if(Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, posLeft.x, posLeft.y)) return 0;
+                    tempPoint = CurrentQMatrix.QMatrix[posLeft.x, posLeft.y];
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("direction", direction, null);

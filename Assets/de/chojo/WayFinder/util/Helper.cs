@@ -454,6 +454,16 @@ namespace de.chojo.WayFinder.util {
         public static bool IsIndexOutOfArray(bool[,] array, int index0, int index1) {
             return index0 < 0 || index1 < 0 || index0 > array.GetLength(0) - 1 || index1 > array.GetLength(1) -1;
         }
+
+        public static double SaveDivide(int first, int second) {
+            if(first == 0 || second == 0) return 0;
+            return first / second;
+        }
+        public static double SaveDivide(double first, double second) {
+            if(first == 0 || second == 0) return 0;
+            return first / second;
+        }
+
     }
 }
 
