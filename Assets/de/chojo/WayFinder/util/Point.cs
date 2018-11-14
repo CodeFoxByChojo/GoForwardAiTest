@@ -12,28 +12,32 @@ namespace de.chojo.WayFinder.util {
         private double _right = 0;
         private double _up = 0;
 
-        private BigInteger _visits = 0;
+        private Visits _visits = new Visits();
 
-        public BigInteger SetValue(Directions direction, double value) {
-            _visits = BigInteger.Add(_visits, BigInteger.One);
-            
-            if (double.IsNaN(value)) {
+        public int SetValue(Directions direction, double value) {
+            if(double.IsNaN(value)) {
                 value = 0;
             }
 
-            switch (direction) {
+            int visitAmount = 0;
+
+            if(Math.Abs(value) > 0.000001) {
+                visitAmount = 1;
+            }
+
+            switch(direction) {
                 case Directions.Up:
                     _up = value;
-                    break;
+                    return _visits.Up += visitAmount;
                 case Directions.Down:
                     _down = value;
-                    break;
+                    return _visits.Up += visitAmount;
                 case Directions.Right:
                     _right = value;
-                    break;
+                    return _visits.Right += visitAmount;
                 case Directions.Left:
                     _left = value;
-                    break;
+                    return _visits.Left += visitAmount;
                 case Directions.None:
                     _none = value;
                     break;
@@ -41,11 +45,11 @@ namespace de.chojo.WayFinder.util {
                     throw new ArgumentOutOfRangeException("direction", direction, null);
             }
 
-            return _visits;
+            return 0;
         }
 
         public double GetValue(Directions direction) {
-            switch (direction) {
+            switch(direction) {
                 case Directions.Up:
                     return _up;
                 case Directions.Down:
@@ -60,15 +64,28 @@ namespace de.chojo.WayFinder.util {
         }
 
         public Directions GetBestDirection() {
-            if (_up > _down && _up > _right && _up > _left)
+            if(Helper.IsLargestNumber(_up, _down, _right, _left))
                 return Directions.Up;
-            if (_down > _up && _down > _right && _down > _left)
+            if(Helper.IsLargestNumber(_down, _up, _right, _left))
                 return Directions.Down;
-            if (_left > _up && _left > _down && _left > _right)
+            if(Helper.IsLargestNumber(_left, _up, _down, _right))
                 return Directions.Left;
-            if (_right > _up && _right > _down && _right > _left)
+            if(Helper.IsLargestNumber(_right, _up,_down, _left))
                 return Directions.Right;
             return Directions.None;
+        }
+
+        public Directions GetLowestValueDirection() {
+            if(Helper.IsSmallestNumber(_up, _down, _right, _left))
+                return Directions.Up;
+            if(Helper.IsSmallestNumber(_down, _up, _right, _left))
+                return Directions.Down;
+            if(Helper.IsSmallestNumber(_left, _up, _down, _right))
+                return Directions.Left;
+            if(Helper.IsSmallestNumber(_right, _up,_down, _left))
+                return Directions.Right;
+            return Directions.None;
+
         }
 
         public double GetValueSum() {
@@ -80,9 +97,9 @@ namespace de.chojo.WayFinder.util {
             return temp.Max();
         }
 
-        public BigInteger Visits {
-            get { return _visits; }
-            set { _visits = value; }
+        public Visits Visits {
+            get {return _visits;}
+            set {_visits = value;}
         }
     }
 }

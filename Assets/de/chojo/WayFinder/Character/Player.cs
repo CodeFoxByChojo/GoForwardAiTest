@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using de.chojo.WayFinder.Manager;
 using de.chojo.WayFinder.util;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
@@ -17,12 +18,12 @@ namespace de.chojo.WayFinder.Character {
         private Field _field;
         private readonly float _gamma = 0.9f;
 
-        private BigInteger _maxVisitValue;
+        private int _maxVisitValue;
         private double _maxWayValue;
 
         private CollectiveBrain brain;
 
-        public QMatrixMemory CurrentQMatrix { get; private set; }
+        public QMatrixMemory CurrentQMatrix {get; private set;}
 
 
         private void Start() {
@@ -36,15 +37,15 @@ namespace de.chojo.WayFinder.Character {
             _actionCounterCounter = 1 / _field.ActionsPerSecond;
             CurrentQMatrix = brain.FindQMatrix(_field.Goal, out _maxVisitValue, out _maxWayValue);
 
-            if (WayBlocked(Directions.Up) && WayBlocked(Directions.Down) && WayBlocked(Directions.Left) &&
-                WayBlocked(Directions.Right)) {
+            if(WayBlocked(Directions.Up) && WayBlocked(Directions.Down) && WayBlocked(Directions.Left) &&
+               WayBlocked(Directions.Right)) {
                 _field.RemovePlayer(this);
             }
         }
 
         private void Update() {
             _actionCounterCounter -= Time.deltaTime;
-            if (_actionCounterCounter < 0) {
+            if(_actionCounterCounter < 0) {
                 Move();
                 _actionCounterCounter = 1 / _field.ActionsPerSecond;
                 CheckForGoal();
@@ -56,7 +57,7 @@ namespace de.chojo.WayFinder.Character {
         /// </summary>
         private void SetNewStartPoint() {
             var a = new Vector3Int(Random.Range(0, _field.Dimensions.x), Random.Range(0, _field.Dimensions.y),
-                -1);
+                                   -1);
             _characterPosition.CurrentPos = a;
             gameObject.transform.position = a;
         }
@@ -66,7 +67,7 @@ namespace de.chojo.WayFinder.Character {
         /// Checks, if the player found the goal
         /// </summary>
         private void CheckForGoal() {
-            if (!_field.CheckForGoal(_characterPosition.CurrentPos)) return;
+            if(!_field.CheckForGoal(_characterPosition.CurrentPos)) return;
             GoalFound();
         }
 
@@ -97,27 +98,27 @@ namespace de.chojo.WayFinder.Character {
         private Directions ChooseNextStep() {
             Directions direction = GetDirectionByCuriosity();
 
-            if (direction != Directions.None) {
+            if(direction != Directions.None) {
                 return direction;
             }
 
 
             //Just get a Random Direction
-            if (_field.Learning) {
-                direction = (Directions) Random.Range(0, 4);
+            if(_field.Learning) {
+                direction = (Directions)Random.Range(0, 4);
 
-                while (WayBlocked(direction)) direction = (Directions) Random.Range(0, 4);
+                while(WayBlocked(direction)) direction = (Directions)Random.Range(0, 4);
             }
 
             //Find With Curiosity
             else {
                 direction = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                        _characterPosition.CurrentPos.y]
+                                                   _characterPosition.CurrentPos.y]
                     .GetBestDirection();
-                if (direction == Directions.None) {
-                    direction = (Directions) Random.Range(0, 4);
+                if(direction == Directions.None) {
+                    direction = (Directions)Random.Range(0, 4);
 
-                    while (WayBlocked(direction)) direction = (Directions) Random.Range(0, 4);
+                    while(WayBlocked(direction)) direction = (Directions)Random.Range(0, 4);
                 }
             }
 
@@ -301,13 +302,13 @@ namespace de.chojo.WayFinder.Character {
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         private bool WayBlocked(Directions direction) {
-            if (_field.IsBlocked(
-                Helper.GetNewCoordVector2(
-                    new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), direction))) {
+            if(_field.IsBlocked(
+                                Helper.GetNewCoordVector2(
+                                                          new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), direction))) {
                 return true;
             }
 
-            switch (direction) {
+            switch(direction) {
                 case Directions.Up:
                     return _characterPosition.CurrentPos.y + 1 > _field.Dimensions.y - 1;
                 case Directions.Down:
@@ -328,21 +329,21 @@ namespace de.chojo.WayFinder.Character {
         private void CalculateActionValue(Directions direction) {
             var value =
                 (1 - _alpha) * CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                        _characterPosition.CurrentPos.y]
+                                                      _characterPosition.CurrentPos.y]
                     .GetValue(direction) + _alpha * GetActionValue(direction);
 
-            if (double.IsNaN(value)) {
+            if(double.IsNaN(value)) {
                 value = 0;
                 Debug.Log("Calculation Failed! NaN!");
             }
 
-            BigInteger visits = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y]
+            int visits = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y]
                 .SetValue(direction, value);
-            if (BigInteger.Compare(visits, _maxVisitValue) == 1) {
+            if(visits > _maxVisitValue) {
                 _maxVisitValue = visits;
             }
 
-            if (value > _maxWayValue) {
+            if(value > _maxWayValue) {
                 _maxWayValue = value;
             }
         }
@@ -363,7 +364,7 @@ namespace de.chojo.WayFinder.Character {
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         private Vector3Int GetNewCoord(Directions direction) {
-            switch (direction) {
+            switch(direction) {
                 case Directions.Up:
                     return new Vector3Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y + 1, -1);
                 case Directions.Down:
@@ -388,23 +389,23 @@ namespace de.chojo.WayFinder.Character {
 
             Point tempPoint;
 
-            switch (direction) {
+            switch(direction) {
                 case Directions.Up:
                     //if(_characterPosition.CurrentPos.y + 1 > _field.Dimensions.y) break;
                     tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                        _characterPosition.CurrentPos.y + 1];
+                                                       _characterPosition.CurrentPos.y + 1];
                     break;
                 case Directions.Down:
                     tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                        _characterPosition.CurrentPos.y - 1];
+                                                       _characterPosition.CurrentPos.y - 1];
                     break;
                 case Directions.Right:
                     tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x + 1,
-                        _characterPosition.CurrentPos.y];
+                                                       _characterPosition.CurrentPos.y];
                     break;
                 case Directions.Left:
                     tempPoint = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x - 1,
-                        _characterPosition.CurrentPos.y];
+                                                       _characterPosition.CurrentPos.y];
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("direction", direction, null);
@@ -420,7 +421,7 @@ namespace de.chojo.WayFinder.Character {
         /// <returns></returns>
         private double GetActionValue(Directions direction) {
             return _field.RMatrix.QMatrix[_characterPosition.CurrentPos.x,
-                           _characterPosition.CurrentPos.y]
+                                          _characterPosition.CurrentPos.y]
                        .GetValue(direction) + _gamma * GetBestActionValue(direction);
         }
 
