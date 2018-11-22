@@ -129,7 +129,7 @@ namespace de.chojo.WayFinder.Manager {
                         visits.Up += _memorysToMerge[k].QMatrix[i, j].Visits.Up - _baseMemory.QMatrix[i, j].Visits.Up;
                         visits.Down += _memorysToMerge[k].QMatrix[i, j].Visits.Down - _baseMemory.QMatrix[i, j].Visits.Down;
                         visits.Left += _memorysToMerge[k].QMatrix[i, j].Visits.Left - _baseMemory.QMatrix[i, j].Visits.Left;
-                        visits.Right += _memorysToMerge[k].QMatrix[i, j].Visits.Right - _baseMemory.QMatrix[i, j].Visits.Up;
+                        visits.Right += _memorysToMerge[k].QMatrix[i, j].Visits.Right - _baseMemory.QMatrix[i, j].Visits.Right;
                         mergeIndex++;
                         if(mergeIndex > _mergesPerFrame) {
                             _mergePointIndex++;
