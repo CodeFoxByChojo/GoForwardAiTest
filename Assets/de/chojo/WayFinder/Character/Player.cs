@@ -126,23 +126,32 @@ namespace de.chojo.WayFinder.Character {
             return direction;
         }
 
-        private Directions GetDirectionByCuriosity() {
-            bool _fieldHasValue = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y].GetBestValue() > 0;
 
+        private Directions GetDirectionByCuriosity() {
+            //Does the current field has a value?
+            bool fieldHasValue = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y].GetBestValue() > 0;
+
+            //Is there a existing curiosity?
             if(_field.Curiosity == 0) {
                 return Directions.None;
             }
 
+            //The current point at which the player is.
             Point current = CurrentQMatrix.QMatrix[_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y];
 
+            //Point Above assignes with null
             Point up = null;
+            //Gets the cords for the needed point
             Vector2Int upVector = Helper.GetNewCoordVector2(
                                                             new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y), Directions.Up);
+            //Checks if the point is part of the array
             if(!Helper.IsIndexOutOfArray(CurrentQMatrix.QMatrix, upVector.x, upVector.y)) {
+                //Check if the way is blocked
                 if(!WayBlocked(Directions.Up))
                     up = CurrentQMatrix.QMatrix[upVector.x, upVector.y];
             }
 
+            //Point below
             Point down = null;
             Vector2Int downVector = Helper.GetNewCoordVector2(
                                                               new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
@@ -191,29 +200,44 @@ namespace de.chojo.WayFinder.Character {
                 rightPercent = Helper.SaveDivide(right.Visits.Right, _maxVisitValue);
             }
 
-            if(_fieldHasValue) {
-                //go to field with lowest value.
-                if(up != null)
-                    if(!WayBlocked(Directions.Up))
-                        if(Math.Abs(up.GetBestValue()) < 0.0000000000001)
-                            return Directions.Up;
 
-                if(down != null)
-                    if(!WayBlocked(Directions.Down))
-                        if(Math.Abs(down.GetBestValue()) < 0.0000000000001)
-                            return Directions.Down;
+            //If field has value try to find a field without value to get more way data
+            if(fieldHasValue) {
+                //go to field with no or nearly no WayValue
+                //DEPRECATED
+//                double value = 1;
+//                Directions smallestDir = Directions.None;
+//                if(up != null)
+//                    if(!WayBlocked(Directions.Up))
+//                        if(Math.Abs(up.GetBestValue()) < 0.0000000000001) {
+//                            value = up.GetBestValue();
+//                            smallestDir = Directions.Up;
+//                            return Directions.Up;
+//                        }
+//
+//                if(down != null)
+//                    if(!WayBlocked(Directions.Down))
+//                        if(Math.Abs(down.GetBestValue()) < 0.0000000000001) {
+//                        }
+//
+//                if(left != null)
+//                    if(!WayBlocked(Directions.Left))
+//                        if(Math.Abs(left.GetBestValue()) < 0.0000000000001) {
+//                            return Directions.Left;
+//                        }
+//
+//                if(right != null)
+//                    if(!WayBlocked(Directions.Right))
+//                        if(Math.Abs(right.GetBestValue()) < 0.0000000000001) {
+//                            return Directions.Right;
+//                        }
+//
+//                if(smallestDir != Directions.None)
+//                    return smallestDir;
 
-                if(left != null)
-                    if(!WayBlocked(Directions.Left))
-                        if(Math.Abs(left.GetBestValue()) < 0.0000000000001)
-                            return Directions.Left;
+                //If no field with no or nearly no WayValue is found,
+                //go to field with lowest visit rate.
 
-                if(right != null)
-                    if(!WayBlocked(Directions.Right))
-                        if(Math.Abs(right.GetBestValue()) < 0.0000000000001)
-                            return Directions.Right;
-
-                //Go to field with lowest visit rate.
                 int visits;
                 Directions dir = current.Visits.GetDirectionWithLowestVistis(out visits);
                 if(visits / _maxVisitValue < (_field.Curiosity / 100) * _maxVisitValue)
@@ -221,43 +245,41 @@ namespace de.chojo.WayFinder.Character {
                         return dir;
             }
 
-            if(!_fieldHasValue) {
-                if(Random.Range(1, 100) <= _field.Curiosity) {
-                    //TODO: Go to field with highest Value. If not found return random.
-                    double upValue = 0;
-                    double downValue = 0;
-                    double leftValue = 0;
-                    double rightValue = 0;
+            //If Field has no WayValue try to get a WayValue by finding the best possible Way to another field.
+            if(!fieldHasValue) {
+                double upValue = 0;
+                double downValue = 0;
+                double leftValue = 0;
+                double rightValue = 0;
 
-                    if(up != null)
-                        upValue = up.GetBestValue();
-                    if(down != null)
-                        downValue = down.GetBestValue();
-                    if(left != null)
-                        leftValue = left.GetBestValue();
-                    if(right != null)
-                        rightValue = right.GetBestValue();
+                if(up != null)
+                    upValue = up.GetBestValue();
+                if(down != null)
+                    downValue = down.GetBestValue();
+                if(left != null)
+                    leftValue = left.GetBestValue();
+                if(right != null)
+                    rightValue = right.GetBestValue();
 
-                    if(!WayBlocked(Directions.Up))
-                        if(upValue != 0)
-                            if(Helper.IsLargestNumber(upValue, downValue, leftValue, rightValue))
-                                return Directions.Up;
+                if(!WayBlocked(Directions.Up))
+                    if(upValue != 0)
+                        if(Helper.IsLargestNumber(upValue, downValue, leftValue, rightValue))
+                            return Directions.Up;
 
-                    if(!WayBlocked(Directions.Down))
-                        if(downValue != 0)
-                            if(Helper.IsLargestNumber(downValue, upValue, leftValue, rightValue))
-                                return Directions.Down;
+                if(!WayBlocked(Directions.Down))
+                    if(downValue != 0)
+                        if(Helper.IsLargestNumber(downValue, upValue, leftValue, rightValue))
+                            return Directions.Down;
 
-                    if(!WayBlocked(Directions.Left))
-                        if(leftValue != 0)
-                            if(Helper.IsLargestNumber(leftValue, rightValue, downValue, upValue))
-                                return Directions.Left;
+                if(!WayBlocked(Directions.Left))
+                    if(leftValue != 0)
+                        if(Helper.IsLargestNumber(leftValue, rightValue, downValue, upValue))
+                            return Directions.Left;
 
-                    if(!WayBlocked(Directions.Right))
-                        if(rightValue != 0)
-                            if(Helper.IsLargestNumber(rightValue, leftValue, upValue, downValue))
-                                return Directions.Right;
-                }
+                if(!WayBlocked(Directions.Right))
+                    if(rightValue != 0)
+                        if(Helper.IsLargestNumber(rightValue, leftValue, upValue, downValue))
+                            return Directions.Right;
             }
 
 
