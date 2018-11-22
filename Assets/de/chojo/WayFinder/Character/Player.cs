@@ -161,6 +161,7 @@ namespace de.chojo.WayFinder.Character {
                     down = CurrentQMatrix.QMatrix[downVector.x, downVector.y];
             }
 
+            //Point left
             Point left = null;
             Vector2Int leftVector = Helper.GetNewCoordVector2(
                                                               new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
@@ -170,6 +171,7 @@ namespace de.chojo.WayFinder.Character {
                     left = CurrentQMatrix.QMatrix[leftVector.x, leftVector.y];
             }
 
+            // Point Right
             Point right = null;
             Vector2Int rightVector = Helper.GetNewCoordVector2(
                                                                new Vector2Int(_characterPosition.CurrentPos.x, _characterPosition.CurrentPos.y),
@@ -179,6 +181,8 @@ namespace de.chojo.WayFinder.Character {
                     right = CurrentQMatrix.QMatrix[rightVector.x, rightVector.y];
             }
 
+            //Init for Percent to choose. Init with 100%. The lowest percent is the best percent.
+            //Calculation for counted visits.
             double upPercent = 1;
             double downPercent = 1;
             double leftPercent = 1;

@@ -413,6 +413,12 @@ namespace de.chojo.WayFinder.util {
         }
 
 
+        /// <summary>
+        /// Tests if the first number is smaller than the other
+        /// </summary>
+        /// <param name="Test for smallest number"></param>
+        /// <param name="Other Numbers"></param>
+        /// <returns></returns>
         public static bool IsLargestNumber(double number, params double[] numbers) {
             foreach(var entry in numbers) {
                 if(entry >= number) return false;
@@ -447,10 +453,24 @@ namespace de.chojo.WayFinder.util {
             return index > 0 || index < array.Length - 1;
         }
 
+        /// <summary>
+        /// Returns true if the index is not part of the array bound.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index0"></param>
+        /// <param name="index1"></param>
+        /// <returns></returns>
         public static bool IsIndexOutOfArray(object[,] array, int index0, int index1) {
             return index0 < 0 || index1 < 0 || index0 > array.GetLength(0) - 1 || index1 > array.GetLength(1) -1;
         }
 
+        /// <summary>
+        /// Returns true if the index is not part of the array bound.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index0"></param>
+        /// <param name="index1"></param>
+        /// <returns></returns>
         public static bool IsIndexOutOfArray(bool[,] array, int index0, int index1) {
             return index0 < 0 || index1 < 0 || index0 > array.GetLength(0) - 1 || index1 > array.GetLength(1) -1;
         }

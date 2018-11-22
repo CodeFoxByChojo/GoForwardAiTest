@@ -21,7 +21,7 @@ namespace de.chojo.WayFinder.util {
 
             int visitAmount = 0;
 
-            if(Math.Abs(value) > 0.000001) {
+            if(Math.Abs(value) > 0.000000001) {
                 visitAmount = 1;
             }
 
